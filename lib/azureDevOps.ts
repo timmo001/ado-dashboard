@@ -13,6 +13,7 @@ import {
   AnalyticsLeadCycleTime,
   IterationWorkItems,
   IterationWorkItemWorkItemRelation as IterationWorkItemRelation,
+  WorkItemRevision,
 } from "./types/azureDevOps";
 
 export class AzureDevOps {
@@ -198,5 +199,26 @@ export class AzureDevOps {
       else throw new Error(`Error: ${response.status} - ${response.data}`);
     }
     return data;
+  }
+
+  async updateWorkItem(
+    id: number,
+    workItemRevision: Array<WorkItemRevision>,
+    validateOnly: boolean = false
+  ): Promise<void> {
+    console.log("updateWorkItem:", id, workItemRevision);
+    const response = await axios.patch<WorkItem>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/workItems/${id}?api-version=6.0&validateOnly=${validateOnly}`,
+      workItemRevision,
+      {
+        auth: this.auth,
+        headers: {
+          "Content-Type": "application/json-patch+json",
+        },
+      }
+    );
+    if (response.status === 200) {
+      console.log("Response: ", response.status, response.data);
+    } else throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 }

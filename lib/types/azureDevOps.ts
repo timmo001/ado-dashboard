@@ -203,3 +203,10 @@ export interface UserLinks {
 export interface UserAvatar {
   href: string;
 }
+
+// Work Item Revision
+export interface WorkItemRevision {
+  op: string;
+  path: string;
+  value: string;
+}
