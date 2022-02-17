@@ -71,7 +71,7 @@ const columns: Array<GridColDef> = [
   {
     field: "title",
     headerName: "Title",
-    width: 840,
+    width: 870,
     renderCell: (params: GridRenderCellParams): ReactElement => (
       <Link href={params.row["url"]} target="_blank" underline="none">
         {params.value}
