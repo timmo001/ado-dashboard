@@ -11,6 +11,7 @@ import {
   Alert,
   Autocomplete,
   Button,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -98,7 +99,16 @@ const columns: Array<GridColDef> = [
   {
     field: "tags",
     headerName: "Tags",
-    width: 180,
+    width: 280,
+    renderCell: (params: GridRenderCellParams): ReactElement => (
+      <>
+        {params.value
+          ? params.value
+              .split(";")
+              .map((tag: string) => <Chip key={tag} label={tag} />)
+          : ""}
+      </>
+    ),
   },
 ];
 
