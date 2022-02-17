@@ -1,0 +1,34 @@
+---
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+pr:
+  - master
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+  - stage: "lint"
+    displayName: "👕 Lint"
+    dependsOn: []
+    jobs:
+      - template: pipeline-ci/lint/jsonlint.yml
+      - template: pipeline-ci/lint/markdownlint.yml
+      - template: pipeline-ci/lint/prettier.yml
+      - template: pipeline-ci/lint/yamllint.yml
+  - stage: "build"
+    displayName: "🏗 Build"
+    dependsOn: []
+    jobs:
+      - template: pipeline-ci/build/node.yml
+  - stage: "publish"
+    displayName: "↗ Publish"
+    dependsOn:
+      - "lint"
+      - "build"
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    jobs:
+      - template: pipeline-ci/publish/azure-static-webapp.yml

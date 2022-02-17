@@ -1,0 +1,13 @@
+---
+parameters:
+  path: "$(System.DefaultWorkingDirectory)"
+
+jobs:
+  - job: "yamllint"
+    displayName: "👕 YAMLLint"
+    steps:
+      - script: sudo apt install -y yamllint
+        displayName: "Install"
+      - script: |
+          yamllint ${{ parameters.path }}
+        displayName: "Run"

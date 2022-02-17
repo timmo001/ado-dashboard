@@ -1,0 +1,32 @@
+---
+parameters:
+  workingDirectory: "$(System.DefaultWorkingDirectory)"
+
+jobs:
+  - job: "buildnode"
+    displayName: "🏗 Build"
+    steps:
+      - task: NodeTool@0
+        displayName: "Setup Node"
+        inputs:
+          versionSpec: 16.x
+      - script: |
+          yarn install
+        displayName: "Yarn: install"
+      - script: |
+          yarn build
+        displayName: "Yarn: build"
+      - task: ArchiveFiles@2
+        displayName: "Archive"
+        inputs:
+          archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip"
+          archiveType: "zip"
+          includeRootFolder: true
+          replaceExistingArchive: true
+          rootFolderOrFile: "${{ parameters.workingDirectory }}"
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish Artifacts"
+        inputs:
+          ArtifactName: "build"
+          PathtoPublish: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip"
+          publishLocation: "Container"

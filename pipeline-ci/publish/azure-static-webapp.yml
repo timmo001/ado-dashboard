@@ -1,0 +1,18 @@
+---
+parameters:
+  workingDirectory: "$(System.DefaultWorkingDirectory)"
+
+jobs:
+  - job: "azurestaticwebapp"
+    displayName: "↗ Publish Azure Static WebApp"
+    steps:
+      - task: NodeTool@0
+        displayName: "Setup Node"
+        inputs:
+          versionSpec: 16.x
+      - task: AzureStaticWebApp@0
+        displayName: "Publish Azure Static WebApp"
+        inputs:
+          app_location: "/"
+          output_location: "out"
+          azure_static_web_apps_api_token: $(deployment_token)

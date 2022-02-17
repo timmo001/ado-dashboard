@@ -1,0 +1,14 @@
+---
+parameters:
+  path: "$(System.DefaultWorkingDirectory)"
+
+jobs:
+  - job: "prettier"
+    displayName: "👕 Prettier"
+    steps:
+      - script: sudo npm -g install prettier
+        displayName: "Install"
+      - script: |
+          prettier --check ${{ parameters.path }}/**/*.js*
+          prettier --check ${{ parameters.path }}/**/*.yml
+        displayName: "Run"

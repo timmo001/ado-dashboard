@@ -1,0 +1,40 @@
+{
+  "name": "ado-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "next build && next export",
+    "eslint": "eslint --ext .ts --ext .tsx --color ./",
+    "start:dev": "next dev",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@emotion/react": "11.7.1",
+    "@emotion/styled": "11.6.0",
+    "@fontsource/roboto": "4.5.3",
+    "@mdi/js": "6.5.95",
+    "@mdi/react": "1.5.0",
+    "@mui/lab": "5.0.0-alpha.69",
+    "@mui/material": "5.4.2",
+    "@mui/styles": "5.4.2",
+    "@mui/x-data-grid": "5.5.1",
+    "axios": "0.26.0",
+    "clsx": "1.1.1",
+    "moment": "2.29.1",
+    "next": "12.0.10",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-markdown": "7.1.1",
+    "react-moment": "1.1.1",
+    "recharts": "2.1.9"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.16",
+    "@types/react": "17.0.39",
+    "@typescript-eslint/eslint-plugin": "5.10.1",
+    "@typescript-eslint/parser": "5.10.1",
+    "prettier": "2.5.1",
+    "typescript": "4.5.5"
+  }
+}

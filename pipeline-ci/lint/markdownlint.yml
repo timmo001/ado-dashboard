@@ -1,0 +1,18 @@
+---
+parameters:
+  path: "$(System.DefaultWorkingDirectory)"
+  version: "latest"
+
+jobs:
+  - job: "markdownlint"
+    displayName: "👕 Markdownlint"
+    steps:
+      - script: |
+          docker pull pipelinecomponents/markdownlint:${{ parameters.version }}
+        displayName: "Install"
+      - script: |
+          docker run --rm -i \
+            -v ${{ parameters.path }}:/root/files \
+            pipelinecomponents/markdownlint:${{ parameters.version }} \
+              --warnings /root/files
+        displayName: "Run"
