@@ -49,7 +49,7 @@ function Layout(props: LayoutProps): ReactElement {
         {...props}
         brand="Azure DevOps Dashboard"
         changeColorOnScroll={{
-          height: 200,
+          height: 54,
           color: "primary",
         }}
         color="transparent"
