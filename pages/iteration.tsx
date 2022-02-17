@@ -131,7 +131,7 @@ function Iteration(): ReactElement {
     setAlert(undefined);
     const it = iteration && iteration !== "" ? iteration : "current";
     console.log("Iteration:", it);
-    console.log("Get data..");
+    console.log("Get data:", organization, project);
     azureDevOps = new AzureDevOps(organization, project, personalAccessToken);
     azureDevOps.getIterations().then((result: Array<Iteration>) => {
       setIterations(result);

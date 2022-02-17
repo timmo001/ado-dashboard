@@ -63,7 +63,7 @@ function Dashboard(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data..");
+    console.log("Get data:", organization, project);
     const azureDevOps = new AzureDevOps(
       organization,
       project,
