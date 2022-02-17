@@ -280,7 +280,7 @@ function Iteration(): ReactElement {
           ) : (
             ""
           )}
-          <Grid item xs={10}>
+          <Grid item xs={11}>
             <Grid
               container
               direction="row"
