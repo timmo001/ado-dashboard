@@ -274,23 +274,13 @@ function Iteration(): ReactElement {
           alignContent="space-around"
           justifyContent="space-around">
           {alert ? (
-            <Grid
-              item
-              xs={12}
-              sx={{
-                padding: theme.spacing(1, 4, 4, 4),
-              }}>
+            <Grid item xs={12}>
               <Alert severity="error">{alert}</Alert>
             </Grid>
           ) : (
             ""
           )}
-          <Grid
-            item
-            xs={10}
-            sx={{
-              padding: theme.spacing(1, 2, 1, 2),
-            }}>
+          <Grid item xs={10}>
             <Grid
               container
               direction="row"
@@ -300,7 +290,7 @@ function Iteration(): ReactElement {
                 item
                 xs={8}
                 sx={{
-                  padding: theme.spacing(1, 2, 1, 2),
+                  padding: theme.spacing(1, 0),
                 }}>
                 <Typography component="h3" gutterBottom variant="h4">
                   {currentIteration?.name || "Iteration"}
@@ -312,7 +302,7 @@ function Iteration(): ReactElement {
                     item
                     xs={4}
                     sx={{
-                      padding: theme.spacing(1, 2, 1, 2),
+                      padding: theme.spacing(1, 0),
                     }}>
                     <Autocomplete
                       disablePortal
@@ -346,7 +336,7 @@ function Iteration(): ReactElement {
                   item
                   xs={12}
                   sx={{
-                    padding: theme.spacing(1, 2, 1, 2),
+                    padding: theme.spacing(1, 0),
                   }}
                   justifyContent="flex-end">
                   <Grid item>
@@ -362,7 +352,7 @@ function Iteration(): ReactElement {
                   item
                   xs={12}
                   sx={{
-                    padding: theme.spacing(1, 2, 1, 2),
+                    padding: theme.spacing(1, 0),
                   }}>
                   <DataGrid
                     autoHeight
