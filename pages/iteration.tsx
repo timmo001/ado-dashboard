@@ -302,7 +302,12 @@ function Iteration(): ReactElement {
                 sx={{
                   padding: theme.spacing(1, 0),
                 }}>
-                <Typography component="h3" gutterBottom variant="h4">
+                <Typography
+                  component="h3"
+                  variant="h4"
+                  sx={{
+                    padding: theme.spacing(1.2, 0, 1, 0),
+                  }}>
                   {currentIteration?.name || "Iteration"}
                 </Typography>
               </Grid>
@@ -339,7 +344,7 @@ function Iteration(): ReactElement {
                 ""
               )}
             </Grid>
-            {currentWorkItemsView&&states ? (
+            {currentWorkItemsView && states ? (
               <>
                 <Grid
                   container
