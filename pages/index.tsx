@@ -161,14 +161,9 @@ function Dashboard(): ReactElement {
         container
         direction="row"
         alignContent="space-around"
-        justifyContent="space-around">
+        justifyContent="center">
         {alert ? (
-          <Grid
-            item
-            xs={12}
-            sx={{
-              padding: theme.spacing(1, 4, 4, 4),
-            }}>
+          <Grid item xs={11}>
             <Alert severity="error">{alert}</Alert>
           </Grid>
         ) : (
