@@ -118,7 +118,6 @@ export class AzureDevOps {
         },
         url: "",
       });
-      console.log("Iterations:", data);
       return data;
     }
     throw new Error(`Error: ${response.status} - ${response.data}`);
