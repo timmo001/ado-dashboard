@@ -27,15 +27,12 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridSelectionModel,
-  GridToolbarContainer,
-  GridToolbarDensitySelector,
-  GridToolbarExport,
-  GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
 import { Iteration, WorkItemExpanded } from "lib/types/azureDevOps";
+import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
@@ -132,6 +129,7 @@ function Iteration(): ReactElement {
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
+  const [pageSize, setPageSize] = useState<number>(50);
   const [selectionModel, setSelectionModel] =
     React.useState<GridSelectionModel>([]);
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -258,16 +256,6 @@ function Iteration(): ReactElement {
   const classes = useStyles();
   const theme = useTheme();
 
-  function CustomToolbar() {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarFilterButton />
-        <GridToolbarDensitySelector />
-        <GridToolbarExport />
-      </GridToolbarContainer>
-    );
-  }
-
   return (
     <>
       <Layout
@@ -367,14 +355,13 @@ function Iteration(): ReactElement {
                     checkboxSelection
                     columns={columns}
                     columnVisibilityModel={columnVisibilityModel}
-                    components={{
-                      Toolbar: CustomToolbar,
-                    }}
+                    components={{ Toolbar: DataGridToolbar }}
                     initialState={initialState}
-                    pageSize={100}
+                    pageSize={pageSize}
                     rows={currentWorkItemsView}
                     rowsPerPageOptions={[5, 10, 15, 20, 25, 50, 100]}
                     selectionModel={selectionModel}
+                    onPageSizeChange={(newSize: number) => setPageSize(newSize)}
                     onSelectionModelChange={(
                       newSelectionModel: GridSelectionModel
                     ): void => setSelectionModel(newSelectionModel)}
