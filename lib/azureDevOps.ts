@@ -131,7 +131,7 @@ export class AzureDevOps {
         order: 999,
         url: "",
       });
-      return data;
+      return data.filter((state: State) => !state.hidden);
     }
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }

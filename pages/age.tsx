@@ -9,8 +9,6 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  AreaChart,
-  Area,
   Legend,
   Line,
   LineChart,
@@ -19,17 +17,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import moment from "moment";
 
+import { AnalyticsWorkItem, State } from "lib/types/azureDevOps";
 import { AzureDevOps } from "lib/azureDevOps";
-import { groupByKey } from "lib/util";
-import {
-  AnalyticsLeadCycleTime,
-  AnalyticsWorkItem,
-  Iteration,
-  State,
-  WorkItemExpanded,
-} from "lib/types/azureDevOps";
+import { getChartAnalyticsWorkItemsAge } from "lib/chartData";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
 
@@ -37,7 +28,6 @@ function Age(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [analyticsWorkItems, setAnalyticsWorkItems] =
     useState<Array<AnalyticsWorkItem>>();
-  const [iterations, setIterations] = useState<Array<Iteration>>();
   const [states, setStates] = useState<Array<State>>();
 
   const router = useRouter();
@@ -66,9 +56,6 @@ function Age(): ReactElement {
       project,
       personalAccessToken
     );
-    azureDevOps
-      .getIterations()
-      .then((result: Array<Iteration>) => setIterations(result));
     azureDevOps.getStates().then((result: Array<State>) => setStates(result));
     azureDevOps
       .getAnalyticsWorkItems()
@@ -79,51 +66,10 @@ function Age(): ReactElement {
 
   const chartAnalyticsWorkItemsAge = useMemo<
     Array<{ [key: string]: string | number }>
-  >(() => {
-    if (!analyticsWorkItems || !states) return undefined;
-    const dates = groupByKey<AnalyticsWorkItem>(
-      analyticsWorkItems
-        .filter(
-          (workItem: AnalyticsWorkItem) =>
-            workItem.State !== "Removed" && workItem.State !== "Closed"
-        )
-        .sort((a: AnalyticsWorkItem, b: AnalyticsWorkItem) =>
-          a.DateValue > b.DateValue ? 1 : -1
-        ),
-      "DateValue"
-    );
-    return Object.keys(dates).map((date: string) => {
-      let value = {
-        Date: moment(date).format("Do MMM YYYY"),
-      };
-      const sum: number = dates[date].reduce(
-        (a: number, b: AnalyticsWorkItem) => a + b.daysSinceCreated,
-        0
-      );
-      const avg: number = sum / dates[date].length || 0;
-      value["Average Age"] = avg;
-      value["Total Age"] = sum;
-
-      const itemsByStates = groupByKey<AnalyticsWorkItem>(dates[date], "State");
-      Object.keys(itemsByStates).forEach((state: string) => {
-        const sumState: number = itemsByStates[state].reduce(
-          (a: number, b: AnalyticsWorkItem) => {
-            return a + b.daysSinceCreated;
-          },
-          0
-        );
-        const avgState: number = sumState / itemsByStates[state].length || 0;
-        value[`${state} Average Age`] = avgState;
-        value[`${state} Total Age`] = sumState;
-      });
-      return value;
-    });
-  }, [analyticsWorkItems, states]);
-
-  const statesView = useMemo<Array<State>>(() => {
-    if (!states) return undefined;
-    return states.filter((state: State) => !state.hidden);
-  }, [states]);
+  >(
+    () => getChartAnalyticsWorkItemsAge(analyticsWorkItems, states),
+    [analyticsWorkItems, states]
+  );
 
   const classes = useStyles();
   const theme = useTheme();
@@ -158,7 +104,7 @@ function Age(): ReactElement {
           <Typography component="h3" gutterBottom variant="h4">
             Average Age of Open Items
           </Typography>
-          {chartAnalyticsWorkItemsAge && statesView ? (
+          {chartAnalyticsWorkItemsAge && states ? (
             <>
               <div
                 style={{
@@ -174,9 +120,9 @@ function Age(): ReactElement {
                     <Line
                       type="linear"
                       dataKey="Average Age"
-                      stroke={`#${statesView[statesView.length - 1].color}`}
+                      stroke={`#${states[states.length - 1].color}`}
                     />
-                    {statesView
+                    {states
                       .filter((state: State) => state.name !== "Closed")
                       .map((state: State) => (
                         <Line

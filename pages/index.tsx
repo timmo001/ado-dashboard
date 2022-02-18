@@ -27,6 +27,10 @@ import {
   State,
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
+import {
+  getChartAnalyticsWorkItems,
+  getChartAnalyticsWorkItemsCurrentIteration,
+} from "lib/chartData";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
 
@@ -94,54 +98,20 @@ function Dashboard(): ReactElement {
 
   const chartAnalyticsWorkItemsCurrentIteration = useMemo<
     Array<{ [key: string]: string | number }>
-  >(() => {
-    if (!analyticsWorkItemsCurrentIteration) return undefined;
-    const dates = groupByKey<AnalyticsWorkItem>(
-      analyticsWorkItemsCurrentIteration.sort(
-        (a: AnalyticsWorkItem, b: AnalyticsWorkItem) =>
-          a.DateValue > b.DateValue ? 1 : -1
+  >(
+    () =>
+      getChartAnalyticsWorkItemsCurrentIteration(
+        analyticsWorkItemsCurrentIteration
       ),
-      "DateValue"
-    );
-    return Object.keys(dates).map((date: string) => {
-      let value = {
-        Date: moment(date).format("Do MMM YYYY"),
-      };
-      const itemsByStates = groupByKey<AnalyticsWorkItem>(dates[date], "State");
-      Object.keys(itemsByStates).forEach((state: string) => {
-        value[state] = itemsByStates[state].length;
-      });
-      return value;
-    });
-  }, [analyticsWorkItemsCurrentIteration]);
+    [analyticsWorkItemsCurrentIteration]
+  );
 
   const chartAnalyticsWorkItems = useMemo<
     Array<{ [key: string]: string | number }>
-  >(() => {
-    if (!analyticsWorkItems || !states) return undefined;
-    const dates = groupByKey<AnalyticsWorkItem>(
-      analyticsWorkItems
-        .filter(
-          (workItem: AnalyticsWorkItem) =>
-            workItem.State !== "Removed" && workItem.State !== "Closed"
-        )
-        .sort((a: AnalyticsWorkItem, b: AnalyticsWorkItem) =>
-          a.DateValue > b.DateValue ? 1 : -1
-        ),
-      "DateValue"
-    );
-    return Object.keys(dates).map((date: string) => {
-      let value = {
-        Date: moment(date).format("Do MMM YYYY"),
-      };
-      const itemsByStates = groupByKey<AnalyticsWorkItem>(dates[date], "State");
-      Object.keys(itemsByStates).forEach((state: string) => {
-        if (!value[state]) value[state] = 0;
-        value[state] += itemsByStates[state].length;
-      });
-      return value;
-    });
-  }, [analyticsWorkItems, states]);
+  >(
+    () => getChartAnalyticsWorkItems(analyticsWorkItems, states),
+    [analyticsWorkItems, states]
+  );
 
   const currentIteration = useMemo<Iteration>(() => {
     if (!iterations) return undefined;
@@ -149,11 +119,6 @@ function Dashboard(): ReactElement {
       (iteration: Iteration) => iteration.attributes.timeFrame === "current"
     );
   }, [iterations]);
-
-  const statesView = useMemo<Array<State>>(() => {
-    if (!states) return undefined;
-    return states.filter((state: State) => !state.hidden);
-  }, [states]);
 
   const itemsByIteration = useMemo<{
     [iteration: string]: Array<WorkItemExpanded>;
@@ -254,7 +219,7 @@ function Dashboard(): ReactElement {
           <Typography component="h4" gutterBottom variant="h5">
             Items by State
           </Typography>
-          {chartAnalyticsWorkItems && statesView ? (
+          {chartAnalyticsWorkItems && states ? (
             <>
               <div
                 style={{
@@ -267,7 +232,7 @@ function Dashboard(): ReactElement {
                     <YAxis />
                     <Tooltip contentStyle={{ background: "#212121" }} />
                     <Legend />
-                    {statesView
+                    {states
                       .filter((state: State) => state.name !== "Closed")
                       .map((state: State) => (
                         <Line
@@ -300,13 +265,13 @@ function Dashboard(): ReactElement {
           <Typography component="h3" gutterBottom variant="h4">
             Current Sprint
           </Typography>
-          {itemsByStateCurrentIteration && statesView ? (
+          {itemsByStateCurrentIteration && states ? (
             <Grid
               container
               direction="row"
               alignContent="space-around"
               justifyContent="space-around">
-              {statesView.map((state: State) => (
+              {states.map((state: State) => (
                 <Grid
                   key={state.id}
                   item
@@ -333,7 +298,7 @@ function Dashboard(): ReactElement {
           <Typography component="h4" gutterBottom variant="h5">
             Items by State
           </Typography>
-          {chartAnalyticsWorkItemsCurrentIteration && statesView ? (
+          {chartAnalyticsWorkItemsCurrentIteration && states ? (
             <>
               <div
                 style={{
@@ -346,7 +311,7 @@ function Dashboard(): ReactElement {
                     <YAxis />
                     <Tooltip contentStyle={{ background: "#212121" }} />
                     <Legend />
-                    {statesView.map((state: State) => (
+                    {states.map((state: State) => (
                       <Line
                         key={state.id}
                         type="linear"

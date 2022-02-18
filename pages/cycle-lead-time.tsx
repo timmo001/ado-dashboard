@@ -24,6 +24,7 @@ import { groupByKey } from "lib/util";
 import { AnalyticsLeadCycleTime, State } from "lib/types/azureDevOps";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
+import { getChartAnalyticsLeadCycleTime } from "lib/chartData";
 
 function CycleLeadTime(): ReactElement {
   const [alert, setAlert] = useState<string>();
@@ -67,40 +68,10 @@ function CycleLeadTime(): ReactElement {
 
   const chartAnalyticsLeadCycleTime = useMemo<
     Array<{ [key: string]: string | number }>
-  >(() => {
-    if (!analyticsLeadCycleTime) return undefined;
-    const dates = groupByKey<AnalyticsLeadCycleTime>(
-      analyticsLeadCycleTime,
-      "CompletedDateSK"
-    );
-    return Object.keys(dates).map((date: string) => {
-      const sumCycleTime: number = dates[date].reduce(
-        (a: number, b: AnalyticsLeadCycleTime) => a + b.CycleTimeDays,
-        0
-      );
-      const avgCycleTime: number = sumCycleTime / dates[date].length || 0;
-
-      const sumLeadTime: number = dates[date].reduce(
-        (a: number, b: AnalyticsLeadCycleTime) => a + b.LeadTimeDays,
-        0
-      );
-      const avgLeadTime: number = sumLeadTime / dates[date].length || 0;
-
-      let value = {
-        Date: moment(date).format("Do MMM YYYY"),
-        "Average Cycle Time": avgCycleTime,
-        "Total Cycle Time": sumCycleTime,
-        "Average Lead Time": avgLeadTime,
-        "Total Lead Time": sumLeadTime,
-      };
-      return value;
-    });
-  }, [analyticsLeadCycleTime]);
-
-  const statesView = useMemo<Array<State>>(() => {
-    if (!states) return undefined;
-    return states.filter((state: State) => !state.hidden);
-  }, [states]);
+  >(
+    () => getChartAnalyticsLeadCycleTime(analyticsLeadCycleTime),
+    [analyticsLeadCycleTime]
+  );
 
   const classes = useStyles();
   const theme = useTheme();
@@ -138,7 +109,7 @@ function CycleLeadTime(): ReactElement {
           <Typography component="h3" gutterBottom variant="h4">
             Average Cycle/Lead Time
           </Typography>
-          {chartAnalyticsLeadCycleTime && statesView ? (
+          {chartAnalyticsLeadCycleTime && states ? (
             <>
               <div
                 style={{
@@ -160,16 +131,12 @@ function CycleLeadTime(): ReactElement {
                         y2="1">
                         <stop
                           offset="5%"
-                          stopColor={`#${
-                            statesView[statesView.length - 4].color
-                          }`}
+                          stopColor={`#${states[states.length - 4].color}`}
                           stopOpacity={0.9}
                         />
                         <stop
                           offset="95%"
-                          stopColor={`#${
-                            statesView[statesView.length - 4].color
-                          }`}
+                          stopColor={`#${states[states.length - 4].color}`}
                           stopOpacity={0.1}
                         />
                       </linearGradient>
@@ -181,16 +148,12 @@ function CycleLeadTime(): ReactElement {
                         y2="1">
                         <stop
                           offset="5%"
-                          stopColor={`#${
-                            statesView[statesView.length - 2].color
-                          }`}
+                          stopColor={`#${states[states.length - 2].color}`}
                           stopOpacity={0.9}
                         />
                         <stop
                           offset="95%"
-                          stopColor={`#${
-                            statesView[statesView.length - 2].color
-                          }`}
+                          stopColor={`#${states[states.length - 2].color}`}
                           stopOpacity={0.1}
                         />
                       </linearGradient>
@@ -198,14 +161,14 @@ function CycleLeadTime(): ReactElement {
                     <Area
                       type="linear"
                       dataKey="Average Cycle Time"
-                      stroke={`#${statesView[statesView.length - 4].color}`}
+                      stroke={`#${states[states.length - 4].color}`}
                       fillOpacity={1}
                       fill="url(#colorAverageCycle)"
                     />
                     <Area
                       type="linear"
                       dataKey="Average Lead Time"
-                      stroke={`#${statesView[statesView.length - 2].color}`}
+                      stroke={`#${states[states.length - 2].color}`}
                       fillOpacity={1}
                       fill="url(#colorAverageLead)"
                     />
