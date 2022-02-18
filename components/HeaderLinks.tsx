@@ -52,6 +52,17 @@ function HeaderLinks(): ReactElement {
       <ListItem className={classes.listItem}>
         <Link
           href={{
+            pathname: "/backlog",
+            query: router.query,
+          }}>
+          <Button variant="text" className={classes.navLink}>
+            <span className={classes.listItemText}>Backlog</span>
+          </Button>
+        </Link>
+      </ListItem>
+      <ListItem className={classes.listItem}>
+        <Link
+          href={{
             pathname: "/iteration",
             query: router.query,
           }}>
