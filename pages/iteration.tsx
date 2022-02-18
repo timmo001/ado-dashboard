@@ -33,6 +33,11 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridSelectionModel,
+  GridToolbar,
+  GridToolbarContainer,
+  GridToolbarDensitySelector,
+  GridToolbarExport,
+  GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import moment from "moment";
 
@@ -260,6 +265,16 @@ function Iteration(): ReactElement {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  }
+
   return (
     <>
       <Layout
@@ -359,6 +374,9 @@ function Iteration(): ReactElement {
                     checkboxSelection
                     columns={columns}
                     columnVisibilityModel={columnVisibilityModel}
+                    components={{
+                      Toolbar: CustomToolbar,
+                    }}
                     initialState={initialState}
                     pageSize={100}
                     rows={currentWorkItemsView}
