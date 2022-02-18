@@ -13,16 +13,10 @@ import {
   Button,
   Chip,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Link,
   TextField,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import {
@@ -33,7 +27,6 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridSelectionModel,
-  GridToolbar,
   GridToolbarContainer,
   GridToolbarDensitySelector,
   GridToolbarExport,
@@ -44,9 +37,10 @@ import moment from "moment";
 import { AzureDevOps } from "lib/azureDevOps";
 import { Iteration, WorkItemExpanded } from "lib/types/azureDevOps";
 import Layout from "components/Layout";
+import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
 
-interface Picker {
+export interface Picker {
   id: string;
   label: string;
 }
@@ -137,7 +131,7 @@ function Iteration(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
-  const [newIteration, setNewIteration] = useState<Picker>();
+  const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [selectionModel, setSelectionModel] =
     React.useState<GridSelectionModel>([]);
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -233,16 +227,14 @@ function Iteration(): ReactElement {
 
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);
-    setNewIteration(
-      iterationsPicker.find((it: Picker) => it.id === currentIteration.id)
-    );
+    setMoveIteration(true);
   }
 
   function handleCloseMoveIteration(): void {
-    setNewIteration(null);
+    setMoveIteration(false);
   }
 
-  function handleMoveIterationConfirm(): void {
+  function handleMoveIterationConfirm(newIteration: Picker): void {
     const it = iterations.find((it: Iteration) => it.id === newIteration.id);
     if (!it) {
       console.error("Could not find iteration");
@@ -263,7 +255,6 @@ function Iteration(): ReactElement {
 
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   function CustomToolbar() {
     return (
@@ -399,41 +390,16 @@ function Iteration(): ReactElement {
           </Grid>
         </Grid>
       </Layout>
-      <Dialog
-        fullScreen={fullScreen}
-        fullWidth
-        maxWidth="sm"
-        scroll="body"
-        open={newIteration ? true : false}
-        onClose={handleCloseMoveIteration}>
-        <DialogTitle>Move iteration</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Select an iteration to move these items to.
-          </DialogContentText>
-          <Autocomplete
-            disableClearable
-            id="new-iteration"
-            options={iterationsPicker}
-            value={newIteration}
-            onChange={(_event, newValue: Picker) => {
-              setNewIteration(
-                iterationsPicker.find((it: Picker) => it.id === newValue.id)
-              );
-            }}
-            renderInput={(params): JSX.Element => (
-              <TextField {...params} label="New Iteration" />
-            )}
-            sx={{
-              margin: theme.spacing(3, 0.5, 0),
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseMoveIteration}>Cancel</Button>
-          <Button onClick={handleMoveIterationConfirm}>Move</Button>
-        </DialogActions>
-      </Dialog>
+      {moveIteration ? (
+        <MoveIteration
+          iterationsPicker={iterationsPicker}
+          initialIteration={currentIterationPicker}
+          handleCloseMoveIteration={handleCloseMoveIteration}
+          handleMoveIterationConfirm={handleMoveIterationConfirm}
+        />
+      ) : (
+        ""
+      )}
     </>
   );
 }
