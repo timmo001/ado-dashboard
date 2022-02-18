@@ -185,23 +185,21 @@ function Dashboard(): ReactElement {
               direction="row"
               alignContent="space-around"
               justifyContent="space-around">
-              {states
-                .filter((state: State) => !state.hidden)
-                .map((state: State) => (
-                  <Grid
-                    key={state.id}
-                    item
-                    xs={4}
-                    sx={{
-                      padding: theme.spacing(1),
-                      color: `#${state.color}`,
-                    }}>
-                    <Typography variant="h4">{state.name}</Typography>
-                    <Typography variant="h5">
-                      {itemsByStateBacklog[state.name]?.length || 0}
-                    </Typography>
-                  </Grid>
-                ))}
+              {states.map((state: State) => (
+                <Grid
+                  key={state.id}
+                  item
+                  xs={4}
+                  sx={{
+                    padding: theme.spacing(1),
+                    color: `#${state.color}`,
+                  }}>
+                  <Typography variant="h4">{state.name}</Typography>
+                  <Typography variant="h5">
+                    {itemsByStateBacklog[state.name]?.length || 0}
+                  </Typography>
+                </Grid>
+              ))}
             </Grid>
           ) : (
             <Grid

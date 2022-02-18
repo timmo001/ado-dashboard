@@ -38,6 +38,7 @@ import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
+import { groupByKey } from "lib/util";
 
 export interface Picker {
   id: string;
@@ -173,6 +174,13 @@ function Backlog(): ReactElement {
     }));
   }, [workItems]);
 
+  const itemsByState = useMemo<{
+    [state: string]: Array<WorkItemExpanded>;
+  }>(() => {
+    if (!workItems) return undefined;
+    return groupByKey<WorkItemExpanded>(workItems, "System.State");
+  }, [workItems]);
+
   const columns: Array<GridColDef> = [
     {
       field: "id",
@@ -290,41 +298,71 @@ function Backlog(): ReactElement {
             ""
           )}
           <Grid item xs={11}>
-            <Grid
-              container
-              direction="row"
-              alignContent="space-between"
-              justifyContent="space-between">
-              <Grid
-                item
-                xs={8}
-                sx={{
-                  padding: theme.spacing(1, 0),
-                }}>
-                <Typography component="h3" gutterBottom variant="h4">
-                  Backlog
-                </Typography>
-              </Grid>
-              <Grid
-                container
-                item
-                xs
-                sx={{
-                  padding: theme.spacing(1, 0),
-                }}
-                justifyContent="flex-end">
-                <Grid item>
-                  <Button
-                    disabled={selectionModel.length > 0 ? false : true}
-                    variant="outlined"
-                    onClick={handleMoveIteration}>
-                    Move to Sprint..
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-            {workItemsView ? (
+            {workItemsView && states ? (
               <>
+                <Grid
+                  container
+                  direction="row"
+                  alignContent="space-between"
+                  justifyContent="space-between">
+                  <Grid
+                    item
+                    xs={8}
+                    sx={{
+                      padding: theme.spacing(1, 0),
+                    }}>
+                    <Typography component="h3" gutterBottom variant="h4">
+                      Backlog
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    sx={{
+                      padding: theme.spacing(1, 0),
+                    }}
+                    justifyContent="flex-end">
+                    <Grid
+                      item
+                      xs
+                      container
+                      direction="row"
+                      alignContent="space-around"
+                      justifyContent="space-around">
+                      {states
+                        .filter((state: State) => state.name !== "Closed")
+                        .map((state: State) => (
+                          <Grid
+                            key={state.id}
+                            item
+                            sx={{
+                              padding: theme.spacing(1),
+                              color: `#${state.color}`,
+                            }}>
+                            <Typography component="span" variant="body1">
+                              {state.name}:{" "}
+                              {itemsByState[state.name]?.length || 0}
+                            </Typography>
+                          </Grid>
+                        ))}
+                    </Grid>
+                    <Grid
+                      item
+                      xs={3}
+                      container
+                      direction="row"
+                      alignContent="space-around"
+                      justifyContent="flex-end">
+                      <Button
+                        disabled={selectionModel.length > 0 ? false : true}
+                        variant="outlined"
+                        onClick={handleMoveIteration}>
+                        Move to Sprint..
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
                 <Grid
                   item
                   xs={12}

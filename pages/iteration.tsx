@@ -31,6 +31,7 @@ import {
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
+import { groupByKey } from "lib/util";
 import { Iteration, State, WorkItemExpanded } from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
@@ -75,7 +76,7 @@ function Iteration(): ReactElement {
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [pageSize, setPageSize] = useState<number>(50);
-  const [selectionModel, setSelectionModel] =useState<GridSelectionModel>([]);
+  const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
@@ -169,6 +170,13 @@ function Iteration(): ReactElement {
       storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
       tags: wi["System.Tags"],
     }));
+  }, [currentWorkItems]);
+
+  const itemsByState = useMemo<{
+    [state: string]: Array<WorkItemExpanded>;
+  }>(() => {
+    if (!currentWorkItems) return undefined;
+    return groupByKey<WorkItemExpanded>(currentWorkItems, "System.State");
   }, [currentWorkItems]);
 
   const columns: Array<GridColDef> = [
@@ -331,7 +339,7 @@ function Iteration(): ReactElement {
                 ""
               )}
             </Grid>
-            {currentWorkItemsView ? (
+            {currentWorkItemsView&&states ? (
               <>
                 <Grid
                   container
@@ -341,7 +349,34 @@ function Iteration(): ReactElement {
                     padding: theme.spacing(1, 0),
                   }}
                   justifyContent="flex-end">
-                  <Grid item>
+                  <Grid
+                    item
+                    xs
+                    container
+                    direction="row"
+                    alignContent="space-around"
+                    justifyContent="space-around">
+                    {states.map((state: State) => (
+                      <Grid
+                        key={state.id}
+                        item
+                        sx={{
+                          padding: theme.spacing(1),
+                          color: `#${state.color}`,
+                        }}>
+                        <Typography component="span" variant="body1">
+                          {state.name}: {itemsByState[state.name]?.length || 0}
+                        </Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  <Grid
+                    item
+                    xs={3}
+                    container
+                    direction="row"
+                    alignContent="space-around"
+                    justifyContent="flex-end">
                     <Button
                       disabled={selectionModel.length > 0 ? false : true}
                       variant="outlined"
