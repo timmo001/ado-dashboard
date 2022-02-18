@@ -28,6 +28,7 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridSelectionModel,
+  GridSortModel,
 } from "@mui/x-data-grid";
 import moment from "moment";
 
@@ -71,8 +72,14 @@ function Iteration(): ReactElement {
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, iteration, filter } =
-    router.query as NodeJS.Dict<string>;
+  const {
+    personalAccessToken,
+    organization,
+    project,
+    iteration,
+    filter,
+    sort,
+  } = router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
     const missingParameters: Array<string> = [];
@@ -230,17 +237,21 @@ function Iteration(): ReactElement {
   ];
 
   const initialState = useMemo<GridInitialState>(() => {
-    const filterModel: Array<GridFilterModel> =
+    const filterModel: GridFilterModel =
       filter && filter !== "" ? JSON.parse(filter) : undefined;
     console.log("Filter model:", filterModel);
+    const sortModel: GridSortModel =
+      sort && sort !== ""
+        ? JSON.parse(sort)
+        : [
+            {
+              field: "order",
+              sort: "asc",
+            },
+          ];
     return {
       sorting: {
-        sortModel: [
-          {
-            field: "order",
-            sort: "asc",
-          },
-        ],
+        sortModel: sortModel,
       },
       filter: {
         filterModel: filterModel,
@@ -415,6 +426,15 @@ function Iteration(): ReactElement {
                     onSelectionModelChange={(
                       newSelectionModel: GridSelectionModel
                     ): void => setSelectionModel(newSelectionModel)}
+                    onSortModelChange={(newSortModel: GridSortModel) => {
+                      router.push({
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          sort: JSON.stringify(newSortModel),
+                        },
+                      });
+                    }}
                     onFilterModelChange={(newFilterModel: GridFilterModel) => {
                       router.push({
                         pathname: router.pathname,

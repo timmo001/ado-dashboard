@@ -26,6 +26,7 @@ import {
   GridRenderCellParams,
   GridRowId,
   GridSelectionModel,
+  GridSortModel,
 } from "@mui/x-data-grid";
 import moment from "moment";
 
@@ -73,7 +74,7 @@ function Backlog(): ReactElement {
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, query, filter } =
+  const { personalAccessToken, organization, project, query, filter, sort } =
     router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
@@ -237,17 +238,21 @@ function Backlog(): ReactElement {
   ];
 
   const initialState = useMemo<GridInitialState>(() => {
-    const filterModel: Array<GridFilterModel> =
+    const filterModel: GridFilterModel =
       filter && filter !== "" ? JSON.parse(filter) : undefined;
     console.log("Filter model:", filterModel);
+    const sortModel: GridSortModel =
+      sort && sort !== ""
+        ? JSON.parse(sort)
+        : [
+            {
+              field: "order",
+              sort: "asc",
+            },
+          ];
     return {
       sorting: {
-        sortModel: [
-          {
-            field: "order",
-            sort: "asc",
-          },
-        ],
+        sortModel: sortModel,
       },
       filter: {
         filterModel: filterModel,
@@ -388,6 +393,15 @@ function Backlog(): ReactElement {
                     onSelectionModelChange={(
                       newSelectionModel: GridSelectionModel
                     ): void => setSelectionModel(newSelectionModel)}
+                    onSortModelChange={(newSortModel: GridSortModel) => {
+                      router.push({
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          sort: JSON.stringify(newSortModel),
+                        },
+                      });
+                    }}
                     onFilterModelChange={(newFilterModel: GridFilterModel) => {
                       router.push({
                         pathname: router.pathname,
