@@ -1,5 +1,6 @@
 import axios, { AxiosBasicCredentials } from "axios";
 import moment from "moment";
+import path from "path/posix";
 
 import {
   Iteration,
@@ -104,7 +105,22 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/${this.project}/_apis/work/teamsettings/iterations?api-version=6.0`,
       { auth: this.auth }
     );
-    if (response.status == 200) return response.data.value;
+    if (response.status == 200) {
+      const data = response.data.value;
+      data.unshift({
+        id: "",
+        name: "Backlog",
+        path: data[0].path.substring(0, data[0].path.indexOf("\\")),
+        attributes: {
+          startDate: "",
+          finishDate: "",
+          timeFrame: "never",
+        },
+        url: "",
+      });
+      console.log("Iterations:", data);
+      return data;
+    }
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
