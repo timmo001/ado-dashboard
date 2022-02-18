@@ -219,7 +219,7 @@ function Dashboard(): ReactElement {
               <div
                 style={{
                   width: "100%",
-                  height: 600,
+                  height: 520,
                 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartAnalyticsWorkItems}>
@@ -298,7 +298,7 @@ function Dashboard(): ReactElement {
               <div
                 style={{
                   width: "100%",
-                  height: 600,
+                  height: 520,
                 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartAnalyticsWorkItemsCurrentIteration}>
