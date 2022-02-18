@@ -289,7 +289,7 @@ function Iteration(): ReactElement {
           alignContent="space-around"
           justifyContent="space-around">
           {alert ? (
-            <Grid item xs={12}>
+            <Grid item xs={11}>
               <Alert severity="error">{alert}</Alert>
             </Grid>
           ) : (

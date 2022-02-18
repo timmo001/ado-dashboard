@@ -84,12 +84,7 @@ function Age(): ReactElement {
         alignContent="space-around"
         justifyContent="space-around">
         {alert ? (
-          <Grid
-            item
-            xs={12}
-            sx={{
-              padding: theme.spacing(1, 4, 4, 4),
-            }}>
+          <Grid item xs={11}>
             <Alert severity="error">{alert}</Alert>
           </Grid>
         ) : (
@@ -97,9 +92,9 @@ function Age(): ReactElement {
         )}
         <Grid
           item
-          xs={10}
+          xs={11}
           sx={{
-            padding: theme.spacing(1, 2, 1, 2),
+            padding: theme.spacing(1, 0),
           }}>
           <Typography component="h3" gutterBottom variant="h4">
             Average Age of Open Items
