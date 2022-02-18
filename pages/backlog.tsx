@@ -287,26 +287,26 @@ function Backlog(): ReactElement {
                   Backlog
                 </Typography>
               </Grid>
+              <Grid
+                container
+                item
+                xs
+                sx={{
+                  padding: theme.spacing(1, 0),
+                }}
+                justifyContent="flex-end">
+                <Grid item>
+                  <Button
+                    disabled={selectionModel.length > 0 ? false : true}
+                    variant="outlined"
+                    onClick={handleMoveIteration}>
+                    Move to Sprint..
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
             {workItemsView ? (
               <>
-                <Grid
-                  container
-                  item
-                  xs={12}
-                  sx={{
-                    padding: theme.spacing(1, 0),
-                  }}
-                  justifyContent="flex-end">
-                  <Grid item>
-                    <Button
-                      disabled={selectionModel.length > 0 ? false : true}
-                      variant="outlined"
-                      onClick={handleMoveIteration}>
-                      Move to Sprint..
-                    </Button>
-                  </Grid>
-                </Grid>
                 <Grid
                   item
                   xs={12}
