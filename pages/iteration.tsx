@@ -31,7 +31,7 @@ import {
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
-import { Iteration, WorkItemExpanded } from "lib/types/azureDevOps";
+import { Iteration, State, WorkItemExpanded } from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
@@ -52,61 +52,6 @@ interface WorkItemsView {
   storyPoints: number;
   tags: string;
 }
-
-const columns: Array<GridColDef> = [
-  {
-    field: "id",
-    headerName: "ID",
-    width: 60,
-  },
-  {
-    field: "order",
-    headerName: "Order",
-    width: 90,
-  },
-  {
-    field: "title",
-    headerName: "Title",
-    width: 870,
-    renderCell: (params: GridRenderCellParams): ReactElement => (
-      <Link href={params.row["url"]} target="_blank" underline="none">
-        {params.value}
-      </Link>
-    ),
-  },
-  {
-    field: "url",
-  },
-  {
-    field: "state",
-    headerName: "State",
-    width: 140,
-  },
-  {
-    field: "assignedTo",
-    headerName: "Assigned To",
-    width: 140,
-  },
-  {
-    field: "storyPoints",
-    headerName: "Story Points",
-    width: 110,
-  },
-  {
-    field: "tags",
-    headerName: "Tags",
-    width: 280,
-    renderCell: (params: GridRenderCellParams): ReactElement => (
-      <>
-        {params.value
-          ? params.value
-              .split(";")
-              .map((tag: string) => <Chip key={tag} label={tag} />)
-          : ""}
-      </>
-    ),
-  },
-];
 
 const columnVisibilityModel: GridColumnVisibilityModel = {
   url: false,
@@ -130,8 +75,8 @@ function Iteration(): ReactElement {
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [pageSize, setPageSize] = useState<number>(50);
-  const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+  const [selectionModel, setSelectionModel] =useState<GridSelectionModel>([]);
+  const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
@@ -176,6 +121,7 @@ function Iteration(): ReactElement {
             .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
         );
     });
+    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
   }, [organization, project, personalAccessToken, iteration]);
 
   useEffect(() => {
@@ -224,6 +170,66 @@ function Iteration(): ReactElement {
       tags: wi["System.Tags"],
     }));
   }, [currentWorkItems]);
+
+  const columns: Array<GridColDef> = [
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+    },
+    {
+      field: "order",
+      headerName: "Order",
+      width: 90,
+    },
+    {
+      field: "title",
+      headerName: "Title",
+      width: 870,
+      renderCell: (params: GridRenderCellParams): ReactElement => (
+        <Link href={params.row["url"]} target="_blank" underline="none">
+          {params.value}
+        </Link>
+      ),
+    },
+    {
+      field: "url",
+    },
+    {
+      field: "state",
+      headerName: "State",
+      width: 140,
+      sortComparator: (v1: string, v2: string): number =>
+        states.find((state: State) => state.name === v1)?.order >
+        states.find((state: State) => state.name === v2)?.order
+          ? 1
+          : -1,
+    },
+    {
+      field: "assignedTo",
+      headerName: "Assigned To",
+      width: 140,
+    },
+    {
+      field: "storyPoints",
+      headerName: "Story Points",
+      width: 110,
+    },
+    {
+      field: "tags",
+      headerName: "Tags",
+      width: 280,
+      renderCell: (params: GridRenderCellParams): ReactElement => (
+        <>
+          {params.value
+            ? params.value
+                .split(";")
+                .map((tag: string) => <Chip key={tag} label={tag} />)
+            : ""}
+        </>
+      ),
+    },
+  ];
 
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);

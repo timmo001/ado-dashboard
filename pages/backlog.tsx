@@ -29,7 +29,11 @@ import {
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
-import { Iteration as Backlog, WorkItemExpanded } from "lib/types/azureDevOps";
+import {
+  Iteration as Backlog,
+  State,
+  WorkItemExpanded,
+} from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
@@ -52,66 +56,6 @@ interface WorkItemsView {
   tags: string;
 }
 
-const columns: Array<GridColDef> = [
-  {
-    field: "id",
-    headerName: "ID",
-    width: 60,
-  },
-  {
-    field: "order",
-    headerName: "Order",
-    width: 90,
-  },
-  {
-    field: "title",
-    headerName: "Title",
-    width: 870,
-    renderCell: (params: GridRenderCellParams): ReactElement => (
-      <Link href={params.row["url"]} target="_blank" underline="none">
-        {params.value}
-      </Link>
-    ),
-  },
-  {
-    field: "url",
-  },
-  {
-    field: "state",
-    headerName: "State",
-    width: 140,
-  },
-  {
-    field: "iteration",
-    headerName: "Iteration",
-    width: 140,
-  },
-  {
-    field: "assignedTo",
-    headerName: "Assigned To",
-    width: 140,
-  },
-  {
-    field: "storyPoints",
-    headerName: "Story Points",
-    width: 110,
-  },
-  {
-    field: "tags",
-    headerName: "Tags",
-    width: 280,
-    renderCell: (params: GridRenderCellParams): ReactElement => (
-      <>
-        {params.value
-          ? params.value
-              .split(";")
-              .map((tag: string) => <Chip key={tag} label={tag} />)
-          : ""}
-      </>
-    ),
-  },
-];
-
 const columnVisibilityModel: GridColumnVisibilityModel = {
   url: false,
 };
@@ -133,8 +77,8 @@ function Backlog(): ReactElement {
   const [iterations, setIterations] = useState<Array<Backlog>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [pageSize, setPageSize] = useState<number>(50);
-  const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+  const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+  const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
@@ -170,6 +114,7 @@ function Backlog(): ReactElement {
           .getWorkItems(ids)
           .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
       );
+    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
   }, [organization, project, personalAccessToken]);
 
   useEffect(() => {
@@ -219,6 +164,71 @@ function Backlog(): ReactElement {
       tags: wi["System.Tags"],
     }));
   }, [workItems]);
+
+  const columns: Array<GridColDef> = [
+    {
+      field: "id",
+      headerName: "ID",
+      width: 60,
+    },
+    {
+      field: "order",
+      headerName: "Order",
+      width: 90,
+    },
+    {
+      field: "title",
+      headerName: "Title",
+      width: 870,
+      renderCell: (params: GridRenderCellParams): ReactElement => (
+        <Link href={params.row["url"]} target="_blank" underline="none">
+          {params.value}
+        </Link>
+      ),
+    },
+    {
+      field: "url",
+    },
+    {
+      field: "state",
+      headerName: "State",
+      width: 140,
+      sortComparator: (v1: string, v2: string): number =>
+        states.find((state: State) => state.name === v1)?.order >
+        states.find((state: State) => state.name === v2)?.order
+          ? 1
+          : -1,
+    },
+    {
+      field: "iteration",
+      headerName: "Iteration",
+      width: 140,
+    },
+    {
+      field: "assignedTo",
+      headerName: "Assigned To",
+      width: 140,
+    },
+    {
+      field: "storyPoints",
+      headerName: "Story Points",
+      width: 110,
+    },
+    {
+      field: "tags",
+      headerName: "Tags",
+      width: 280,
+      renderCell: (params: GridRenderCellParams): ReactElement => (
+        <>
+          {params.value
+            ? params.value
+                .split(";")
+                .map((tag: string) => <Chip key={tag} label={tag} />)
+            : ""}
+        </>
+      ),
+    },
+  ];
 
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);
