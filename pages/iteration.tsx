@@ -296,17 +296,12 @@ function Iteration(): ReactElement {
               direction="row"
               alignContent="space-between"
               justifyContent="space-between">
-              <Grid
-                item
-                xs={8}
-                sx={{
-                  padding: theme.spacing(1, 0),
-                }}>
+              <Grid item xs={8}>
                 <Typography
                   component="h3"
                   variant="h4"
                   sx={{
-                    padding: theme.spacing(1.2, 0, 1, 0),
+                    padding: theme.spacing(1.8, 0, 1, 0),
                   }}>
                   {currentIteration?.name || "Iteration"}
                 </Typography>

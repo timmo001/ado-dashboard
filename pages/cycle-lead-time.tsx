@@ -95,12 +95,7 @@ function CycleLeadTime(): ReactElement {
         ) : (
           ""
         )}
-        <Grid
-          item
-          xs={11}
-          sx={{
-            padding: theme.spacing(1, 0),
-          }}>
+        <Grid item xs={11}>
           <Typography component="h3" gutterBottom variant="h4">
             Average Cycle/Lead Time
           </Typography>

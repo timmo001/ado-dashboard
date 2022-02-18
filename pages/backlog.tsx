@@ -305,13 +305,8 @@ function Backlog(): ReactElement {
                   direction="row"
                   alignContent="space-between"
                   justifyContent="space-between">
-                  <Grid
-                    item
-                    xs={8}
-                    sx={{
-                      padding: theme.spacing(1, 0),
-                    }}>
-                    <Typography component="h3" gutterBottom variant="h4">
+                  <Grid item xs={8}>
+                    <Typography component="h3" variant="h4">
                       Backlog
                     </Typography>
                   </Grid>
