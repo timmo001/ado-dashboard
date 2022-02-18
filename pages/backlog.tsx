@@ -21,6 +21,7 @@ import {
   DataGrid,
   GridColDef,
   GridColumnVisibilityModel,
+  GridFilterModel,
   GridInitialState,
   GridRenderCellParams,
   GridRowId,
@@ -61,17 +62,6 @@ const columnVisibilityModel: GridColumnVisibilityModel = {
   url: false,
 };
 
-const initialState: GridInitialState = {
-  sorting: {
-    sortModel: [
-      {
-        field: "order",
-        sort: "asc",
-      },
-    ],
-  },
-};
-
 let azureDevOps: AzureDevOps;
 function Backlog(): ReactElement {
   const [alert, setAlert] = useState<string>();
@@ -83,7 +73,7 @@ function Backlog(): ReactElement {
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, query } =
+  const { personalAccessToken, organization, project, query, filter } =
     router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
@@ -246,6 +236,25 @@ function Backlog(): ReactElement {
     },
   ];
 
+  const initialState = useMemo<GridInitialState>(() => {
+    const filterModel: Array<GridFilterModel> =
+      filter && filter !== "" ? JSON.parse(filter) : undefined;
+    console.log("Filter model:", filterModel);
+    return {
+      sorting: {
+        sortModel: [
+          {
+            field: "order",
+            sort: "asc",
+          },
+        ],
+      },
+      filter: {
+        filterModel: filterModel,
+      },
+    };
+  }, [filter]);
+
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);
     setMoveIteration(true);
@@ -298,7 +307,7 @@ function Backlog(): ReactElement {
             ""
           )}
           <Grid item xs={11}>
-            {workItemsView && states ? (
+            {workItemsView && states && initialState ? (
               <>
                 <Grid
                   container
@@ -379,6 +388,15 @@ function Backlog(): ReactElement {
                     onSelectionModelChange={(
                       newSelectionModel: GridSelectionModel
                     ): void => setSelectionModel(newSelectionModel)}
+                    onFilterModelChange={(newFilterModel: GridFilterModel) => {
+                      router.push({
+                        pathname: router.pathname,
+                        query: {
+                          ...router.query,
+                          filter: JSON.stringify(newFilterModel),
+                        },
+                      });
+                    }}
                   />
                 </Grid>
               </>
