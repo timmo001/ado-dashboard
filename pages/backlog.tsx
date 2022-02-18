@@ -112,7 +112,15 @@ function Backlog(): ReactElement {
       .then((ids: Array<number>) =>
         azureDevOps
           .getWorkItems(ids)
-          .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
+          .then((result: Array<WorkItemExpanded>) =>
+            setWorkItems(
+              result.filter(
+                (wi: WorkItemExpanded) =>
+                  wi["System.State"] !== "Closed" &&
+                  wi["System.State"] !== "Removed"
+              )
+            )
+          )
       );
     azureDevOps.getStates().then((result: Array<State>) => setStates(result));
   }, [organization, project, personalAccessToken]);
