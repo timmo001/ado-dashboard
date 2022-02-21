@@ -10,6 +10,13 @@ let theme = createTheme({
     tonalOffset: 0.2,
   },
   components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          margin: 2,
+        },
+      },
+    },
     MuiLink: {
       styleOverrides: {
         root: {
