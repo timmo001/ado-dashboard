@@ -45,7 +45,7 @@ const headerStyle = makeStyles((theme: Theme) => ({
     borderRadius: 3,
     textTransform: "none",
     userSelect: "none",
-    color: theme.palette.primary.contrastText,
+    color: theme.palette.text.primary,
     padding: "8px 16px",
     letterSpacing: "unset",
     "&:hover,&:focus": {

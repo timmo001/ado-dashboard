@@ -3,13 +3,13 @@ import {
   responsiveFontSizes,
   adaptV4Theme,
 } from "@mui/material/styles";
-import { teal, indigo } from "@mui/material/colors";
+import { cyan, indigo, purple } from "@mui/material/colors";
 
 let theme = createTheme(
   adaptV4Theme({
     palette: {
       mode: "dark",
-      primary: teal,
+      primary: cyan,
       secondary: indigo,
       contrastThreshold: 3,
       tonalOffset: 0.2,
@@ -36,6 +36,11 @@ let theme = createTheme(
       MuiCardActions: {
         root: {
           justifyContent: "flex-end",
+        },
+      },
+      MuiLink: {
+        root: {
+          color: purple[400],
         },
       },
     },
