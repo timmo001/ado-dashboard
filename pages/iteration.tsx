@@ -404,14 +404,14 @@ function Iteration(): ReactElement {
                       </Grid>
                     ))}
                   </Grid>
-                  <Grid item sx={{ padding: theme.spacing(0, 1) }}>
+                  <Grid item sx={{ paddingLeft: theme.spacing(1) }}>
                     <Button
                       variant="outlined"
                       onClick={handleGenerateChecklist}>
                       Generate Release Checklist..
                     </Button>
                   </Grid>
-                  <Grid item sx={{ padding: theme.spacing(0, 1) }}>
+                  <Grid item sx={{ paddingLeft: theme.spacing(1) }}>
                     <Button
                       disabled={selectionModel.length > 0 ? false : true}
                       variant="outlined"

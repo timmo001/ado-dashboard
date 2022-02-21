@@ -346,8 +346,7 @@ function Backlog(): ReactElement {
                       container
                       direction="row"
                       alignContent="space-around"
-                      justifyContent="space-around"
-                      sx={{ padding: theme.spacing(0, 1) }}>
+                      justifyContent="space-around">
                       {states.map((state: State) => (
                         <Grid
                           key={state.id}
@@ -363,7 +362,7 @@ function Backlog(): ReactElement {
                         </Grid>
                       ))}
                     </Grid>
-                    <Grid item sx={{ padding: theme.spacing(0, 1) }}>
+                    <Grid item sx={{ paddingLeft: theme.spacing(1) }}>
                       <Button
                         disabled={selectionModel.length > 0 ? false : true}
                         variant="outlined"
