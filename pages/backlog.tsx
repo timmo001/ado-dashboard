@@ -338,6 +338,7 @@ function Backlog(): ReactElement {
                     sx={{
                       padding: theme.spacing(1, 0),
                     }}
+                    alignContent="space-around"
                     justifyContent="flex-end">
                     <Grid
                       item
@@ -345,31 +346,24 @@ function Backlog(): ReactElement {
                       container
                       direction="row"
                       alignContent="space-around"
-                      justifyContent="space-around">
-                      {states
-                        .filter((state: State) => state.name !== "Closed")
-                        .map((state: State) => (
-                          <Grid
-                            key={state.id}
-                            item
-                            sx={{
-                              padding: theme.spacing(1),
-                              color: `#${state.color}`,
-                            }}>
-                            <Typography component="span" variant="body1">
-                              {state.name}:{" "}
-                              {itemsByState[state.name]?.length || 0}
-                            </Typography>
-                          </Grid>
-                        ))}
+                      justifyContent="space-around"
+                      sx={{ padding: theme.spacing(0, 1) }}>
+                      {states.map((state: State) => (
+                        <Grid
+                          key={state.id}
+                          item
+                          sx={{
+                            padding: theme.spacing(1),
+                            color: `#${state.color}`,
+                          }}>
+                          <Typography component="span" variant="body1">
+                            {state.name}:{" "}
+                            {itemsByState[state.name]?.length || 0}
+                          </Typography>
+                        </Grid>
+                      ))}
                     </Grid>
-                    <Grid
-                      item
-                      xs={3}
-                      container
-                      direction="row"
-                      alignContent="space-around"
-                      justifyContent="flex-end">
+                    <Grid item sx={{ padding: theme.spacing(0, 1) }}>
                       <Button
                         disabled={selectionModel.length > 0 ? false : true}
                         variant="outlined"

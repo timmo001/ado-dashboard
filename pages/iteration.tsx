@@ -380,6 +380,7 @@ function Iteration(): ReactElement {
                   sx={{
                     padding: theme.spacing(1, 0),
                   }}
+                  alignContent="space-around"
                   justifyContent="flex-end">
                   <Grid
                     item
@@ -387,7 +388,8 @@ function Iteration(): ReactElement {
                     container
                     direction="row"
                     alignContent="space-around"
-                    justifyContent="space-around">
+                    justifyContent="space-around"
+                    sx={{ padding: theme.spacing(0, 1) }}>
                     {states.map((state: State) => (
                       <Grid
                         key={state.id}
@@ -402,26 +404,14 @@ function Iteration(): ReactElement {
                       </Grid>
                     ))}
                   </Grid>
-                  <Grid
-                    item
-                    xs={3}
-                    container
-                    direction="row"
-                    alignContent="space-around"
-                    justifyContent="flex-end">
+                  <Grid item sx={{ padding: theme.spacing(0, 1) }}>
                     <Button
                       variant="outlined"
                       onClick={handleGenerateChecklist}>
                       Generate Release Checklist..
                     </Button>
-                  </Grid>{" "}
-                  <Grid
-                    item
-                    xs={3}
-                    container
-                    direction="row"
-                    alignContent="space-around"
-                    justifyContent="flex-end">
+                  </Grid>
+                  <Grid item sx={{ padding: theme.spacing(0, 1) }}>
                     <Button
                       disabled={selectionModel.length > 0 ? false : true}
                       variant="outlined"
