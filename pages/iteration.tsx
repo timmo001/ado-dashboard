@@ -39,6 +39,7 @@ import DataGridToolbar from "components/DataGridToolbar";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
+import { XLSXExport } from "lib/xlsxExport";
 
 export interface Picker {
   id: string;
@@ -294,6 +295,10 @@ function Iteration(): ReactElement {
     setup();
   }
 
+  function handleGenerateChecklist(): void {
+    new XLSXExport().generateReleaseChecklist(currentWorkItems);
+  }
+
   const classes = useStyles();
   const theme = useTheme();
 
@@ -397,6 +402,19 @@ function Iteration(): ReactElement {
                       </Grid>
                     ))}
                   </Grid>
+                  <Grid
+                    item
+                    xs={3}
+                    container
+                    direction="row"
+                    alignContent="space-around"
+                    justifyContent="flex-end">
+                    <Button
+                      variant="outlined"
+                      onClick={handleGenerateChecklist}>
+                      Generate Release Checklist..
+                    </Button>
+                  </Grid>{" "}
                   <Grid
                     item
                     xs={3}

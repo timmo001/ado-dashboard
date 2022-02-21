@@ -176,10 +176,15 @@ export interface WorkItemFields {
   "WEF_A32D92E82F644A1991D91FEFDC607DC1_Kanban.Column.Done": boolean;
   "System.Description": string;
   "Custom.Components"?: string;
-  "Custom.Functions"?: string;
   "Custom.ExportList"?: string;
+  "Custom.Fields"?: string;
+  "Custom.Files"?: string;
+  "Custom.Functions"?: string;
   "Custom.Misc"?: string;
   "Custom.ReleaseDetails"?: string;
+  "Custom.Scripts"?: string;
+  "Custom.Source"?: string;
+  "Custom.Tables"?: string;
   "System.Tags": string;
   "System.AssignedTo"?: User;
   "Microsoft.VSTS.Common.ResolvedDate"?: Date;
