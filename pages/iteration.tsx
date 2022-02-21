@@ -53,6 +53,7 @@ interface WorkItemsView {
   state: string;
   assignedTo: string;
   storyPoints: number;
+  type: string;
   tags: string;
 }
 
@@ -165,6 +166,7 @@ function Iteration(): ReactElement {
       state: wi["System.State"],
       assignedTo: wi["System.AssignedTo"]?.displayName,
       storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
+      type: wi["System.WorkItemType"],
       tags: wi["System.Tags"],
     }));
   }, [currentWorkItems]);
@@ -219,6 +221,11 @@ function Iteration(): ReactElement {
       field: "storyPoints",
       headerName: "Story Points",
       width: 110,
+    },
+    {
+      field: "type",
+      headerName: "Type",
+      width: 120,
     },
     {
       field: "tags",
