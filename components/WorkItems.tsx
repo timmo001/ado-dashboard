@@ -16,10 +16,10 @@ import {
   GridRenderCellParams,
   GridSelectionModel,
   GridSortModel,
+  GridToolbar,
 } from "@mui/x-data-grid";
 
 import { State } from "lib/types/azureDevOps";
-import DataGridToolbar from "./DataGridToolbar";
 
 export interface WorkItemsView {
   id: number;
@@ -32,6 +32,15 @@ export interface WorkItemsView {
   storyPoints: number;
   type: string;
   tags: string;
+  components: string;
+  functions: string;
+  exportList: string;
+  tables: string;
+  fields: string;
+  scripts: string;
+  files: string;
+  misc: string;
+  releaseDetails: string;
 }
 
 interface WorkItemsProps {
@@ -41,10 +50,6 @@ interface WorkItemsProps {
   states: Array<State>;
   workItemsView: Array<WorkItemsView>;
 }
-
-const columnVisibilityModel: GridColumnVisibilityModel = {
-  url: false,
-};
 
 function WorkItems({
   backlog,
@@ -56,9 +61,25 @@ function WorkItems({
   const [pageSize, setPageSize] = useState<number>(50);
 
   const router = useRouter();
-  const { filter, sort } = router.query as NodeJS.Dict<string>;
+  const { columnsVisible, filter, sort } = router.query as NodeJS.Dict<string>;
 
   const initialState = useMemo<GridInitialState>(() => {
+    const columnVisibilityModel: GridColumnVisibilityModel =
+      columnsVisible && columnsVisible !== ""
+        ? JSON.parse(columnsVisible)
+        : {
+            url: false,
+            iteration: backlog ? true : false,
+            components: false,
+            functions: false,
+            exportList: false,
+            tables: false,
+            fields: false,
+            scripts: false,
+            files: false,
+            misc: false,
+            releaseDetails: false,
+          };
     const filterModel: GridFilterModel =
       filter && filter !== "" ? JSON.parse(filter) : undefined;
     console.log("Filter model:", filterModel);
@@ -72,6 +93,9 @@ function WorkItems({
             },
           ];
     return {
+      columns: {
+        columnVisibilityModel: columnVisibilityModel,
+      },
       sorting: {
         sortModel: sortModel,
       },
@@ -79,10 +103,11 @@ function WorkItems({
         filterModel: filterModel,
       },
     };
-  }, [filter]);
+  }, [columnsVisible, filter, sort]);
 
   const columns = useMemo<Array<GridColDef>>(() => {
-    let c = [
+    if (!states) return undefined;
+    return [
       {
         field: "id",
         headerName: "ID",
@@ -105,17 +130,14 @@ function WorkItems({
       },
       {
         field: "url",
+        headerName: "URL",
+        width: 400,
       },
-    ];
-
-    if (backlog)
-      c.push({
+      {
         field: "iteration",
         headerName: "Iteration",
         width: 140,
-      });
-
-    c = c.concat([
+      },
       {
         field: "state",
         headerName: "State",
@@ -155,9 +177,52 @@ function WorkItems({
           </>
         ),
       },
-    ]);
-
-    return c;
+      {
+        field: "components",
+        headerName: "Components",
+        width: 120,
+      },
+      {
+        field: "functions",
+        headerName: "Functions",
+        width: 120,
+      },
+      {
+        field: "exportList",
+        headerName: "Export List",
+        width: 120,
+      },
+      {
+        field: "tables",
+        headerName: "Tables",
+        width: 120,
+      },
+      {
+        field: "fields",
+        headerName: "Fields",
+        width: 120,
+      },
+      {
+        field: "scripts",
+        headerName: "Scripts",
+        width: 120,
+      },
+      {
+        field: "files",
+        headerName: "Files",
+        width: 120,
+      },
+      {
+        field: "misc",
+        headerName: "Misc",
+        width: 120,
+      },
+      {
+        field: "releaseDetails",
+        headerName: "Release Details",
+        width: 120,
+      },
+    ];
   }, [backlog, states]);
 
   const theme = useTheme();
@@ -175,13 +240,23 @@ function WorkItems({
             autoHeight
             checkboxSelection
             columns={columns}
-            columnVisibilityModel={columnVisibilityModel}
-            components={{ Toolbar: DataGridToolbar }}
+            components={{ Toolbar: GridToolbar }}
             initialState={initialState}
             pageSize={pageSize}
             rows={workItemsView}
             rowsPerPageOptions={[5, 10, 15, 20, 25, 50, 100]}
             selectionModel={selectionModel}
+            onColumnVisibilityModelChange={(
+              newColumnVisibilityModel: GridColumnVisibilityModel
+            ) => {
+              router.push({
+                pathname: router.pathname,
+                query: {
+                  ...router.query,
+                  columnsVisible: JSON.stringify(newColumnVisibilityModel),
+                },
+              });
+            }}
             onPageSizeChange={(newSize: number) => setPageSize(newSize)}
             onSelectionModelChange={(
               newSelectionModel: GridSelectionModel

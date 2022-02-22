@@ -130,10 +130,20 @@ function Iteration(): ReactElement {
       title: wi["System.Title"],
       url: `https://dev.azure.com/${organization}/${project}/_workitems/edit/${wi.id}`,
       state: wi["System.State"],
+      iteration: wi.iteration,
       assignedTo: wi["System.AssignedTo"]?.displayName,
       storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
       type: wi["System.WorkItemType"],
       tags: wi["System.Tags"],
+      components: wi["Custom.Components"],
+      functions: wi["Custom.Functions"],
+      exportList: wi["Custom.ExportList"],
+      tables: wi["Custom.Tables"],
+      fields: wi["Custom.Fields"],
+      scripts: wi["Custom.Scripts"],
+      files: wi["Custom.Fields"],
+      misc: wi["Custom.Misc"],
+      releaseDetails: wi["Custom.ReleaseDetails"],
     }));
   }, [currentWorkItems]);
 
