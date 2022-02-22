@@ -10,24 +10,12 @@ import { useRouter } from "next/router";
 import {
   Alert,
   Button,
-  Chip,
   CircularProgress,
   Grid,
-  Link,
   Typography,
   useTheme,
 } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridColumnVisibilityModel,
-  GridFilterModel,
-  GridInitialState,
-  GridRenderCellParams,
-  GridRowId,
-  GridSelectionModel,
-  GridSortModel,
-} from "@mui/x-data-grid";
+import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
@@ -36,46 +24,28 @@ import {
   State,
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
-import DataGridToolbar from "components/DataGridToolbar";
+import { groupByKey } from "lib/util";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
-import { groupByKey } from "lib/util";
+import WorkItems, { WorkItemsView } from "components/WorkItems";
 
 export interface Picker {
   id: string;
   label: string;
 }
 
-interface WorkItemsView {
-  id: number;
-  order: number;
-  title: string;
-  url: string;
-  state: string;
-  iteration: string;
-  assignedTo: string;
-  storyPoints: number;
-  type: string;
-  tags: string;
-}
-
-const columnVisibilityModel: GridColumnVisibilityModel = {
-  url: false,
-};
-
 let azureDevOps: AzureDevOps;
 function Backlog(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [iterations, setIterations] = useState<Array<Backlog>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
-  const [pageSize, setPageSize] = useState<number>(50);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, query, filter, sort } =
+  const { personalAccessToken, organization, project, query } =
     router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
@@ -174,99 +144,6 @@ function Backlog(): ReactElement {
     return groupByKey<WorkItemExpanded>(workItems, "System.State");
   }, [workItems]);
 
-  const columns: Array<GridColDef> = [
-    {
-      field: "id",
-      headerName: "ID",
-      width: 60,
-    },
-    {
-      field: "order",
-      headerName: "Order",
-      width: 90,
-    },
-    {
-      field: "title",
-      headerName: "Title",
-      width: 870,
-      renderCell: (params: GridRenderCellParams): ReactElement => (
-        <Link href={params.row["url"]} target="_blank" underline="none">
-          {params.value}
-        </Link>
-      ),
-    },
-    {
-      field: "url",
-    },
-    {
-      field: "state",
-      headerName: "State",
-      width: 140,
-      sortComparator: (v1: string, v2: string): number =>
-        states.find((state: State) => state.name === v1)?.order >
-        states.find((state: State) => state.name === v2)?.order
-          ? 1
-          : -1,
-    },
-    {
-      field: "iteration",
-      headerName: "Iteration",
-      width: 140,
-    },
-    {
-      field: "assignedTo",
-      headerName: "Assigned To",
-      width: 140,
-    },
-    {
-      field: "storyPoints",
-      headerName: "Story Points",
-      width: 110,
-    },
-    {
-      field: "type",
-      headerName: "Type",
-      width: 120,
-    },
-    {
-      field: "tags",
-      headerName: "Tags",
-      width: 280,
-      renderCell: (params: GridRenderCellParams): ReactElement => (
-        <>
-          {params.value
-            ? params.value
-                .split(";")
-                .map((tag: string) => <Chip key={tag} label={tag} />)
-            : ""}
-        </>
-      ),
-    },
-  ];
-
-  const initialState = useMemo<GridInitialState>(() => {
-    const filterModel: GridFilterModel =
-      filter && filter !== "" ? JSON.parse(filter) : undefined;
-    console.log("Filter model:", filterModel);
-    const sortModel: GridSortModel =
-      sort && sort !== ""
-        ? JSON.parse(sort)
-        : [
-            {
-              field: "order",
-              sort: "asc",
-            },
-          ];
-    return {
-      sorting: {
-        sortModel: sortModel,
-      },
-      filter: {
-        filterModel: filterModel,
-      },
-    };
-  }, [filter]);
-
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);
     setMoveIteration(true);
@@ -319,7 +196,7 @@ function Backlog(): ReactElement {
             ""
           )}
           <Grid item xs={11}>
-            {workItemsView && states && initialState ? (
+            {workItemsView && states ? (
               <>
                 <Grid
                   container
@@ -372,47 +249,13 @@ function Backlog(): ReactElement {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    padding: theme.spacing(1, 0),
-                  }}>
-                  <DataGrid
-                    autoHeight
-                    checkboxSelection
-                    columns={columns}
-                    columnVisibilityModel={columnVisibilityModel}
-                    components={{ Toolbar: DataGridToolbar }}
-                    initialState={initialState}
-                    pageSize={pageSize}
-                    rows={workItemsView}
-                    rowsPerPageOptions={[5, 10, 15, 20, 25, 50, 100]}
-                    selectionModel={selectionModel}
-                    onPageSizeChange={(newSize: number) => setPageSize(newSize)}
-                    onSelectionModelChange={(
-                      newSelectionModel: GridSelectionModel
-                    ): void => setSelectionModel(newSelectionModel)}
-                    onSortModelChange={(newSortModel: GridSortModel) => {
-                      router.push({
-                        pathname: router.pathname,
-                        query: {
-                          ...router.query,
-                          sort: JSON.stringify(newSortModel),
-                        },
-                      });
-                    }}
-                    onFilterModelChange={(newFilterModel: GridFilterModel) => {
-                      router.push({
-                        pathname: router.pathname,
-                        query: {
-                          ...router.query,
-                          filter: JSON.stringify(newFilterModel),
-                        },
-                      });
-                    }}
-                  />
-                </Grid>
+                <WorkItems
+                  backlog
+                  states={states}
+                  selectionModel={selectionModel}
+                  workItemsView={workItemsView}
+                  setSelectionModel={setSelectionModel}
+                />
               </>
             ) : (
               <Grid

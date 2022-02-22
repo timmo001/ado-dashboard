@@ -11,56 +11,28 @@ import {
   Alert,
   Autocomplete,
   Button,
-  Chip,
   CircularProgress,
   Grid,
-  Link,
   TextField,
   Typography,
   useTheme,
 } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridColumnVisibilityModel,
-  GridFilterModel,
-  GridInitialState,
-  GridRenderCellParams,
-  GridRowId,
-  GridSelectionModel,
-  GridSortModel,
-} from "@mui/x-data-grid";
+import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
 import { groupByKey } from "lib/util";
 import { Iteration, State, WorkItemExpanded } from "lib/types/azureDevOps";
-import DataGridToolbar from "components/DataGridToolbar";
+import { XLSXExport } from "lib/xlsxExport";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
-import { XLSXExport } from "lib/xlsxExport";
+import WorkItems, { WorkItemsView } from "components/WorkItems";
 
 export interface Picker {
   id: string;
   label: string;
 }
-
-interface WorkItemsView {
-  id: number;
-  order: number;
-  title: string;
-  url: string;
-  state: string;
-  assignedTo: string;
-  storyPoints: number;
-  type: string;
-  tags: string;
-}
-
-const columnVisibilityModel: GridColumnVisibilityModel = {
-  url: false,
-};
 
 let azureDevOps: AzureDevOps;
 function Iteration(): ReactElement {
@@ -68,20 +40,13 @@ function Iteration(): ReactElement {
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
-  const [pageSize, setPageSize] = useState<number>(50);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const {
-    personalAccessToken,
-    organization,
-    project,
-    iteration,
-    filter,
-    sort,
-  } = router.query as NodeJS.Dict<string>;
+  const { personalAccessToken, organization, project, iteration } =
+    router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
     const missingParameters: Array<string> = [];
@@ -178,94 +143,6 @@ function Iteration(): ReactElement {
     if (!currentWorkItems) return undefined;
     return groupByKey<WorkItemExpanded>(currentWorkItems, "System.State");
   }, [currentWorkItems]);
-
-  const columns: Array<GridColDef> = [
-    {
-      field: "id",
-      headerName: "ID",
-      width: 60,
-    },
-    {
-      field: "order",
-      headerName: "Order",
-      width: 90,
-    },
-    {
-      field: "title",
-      headerName: "Title",
-      width: 870,
-      renderCell: (params: GridRenderCellParams): ReactElement => (
-        <Link href={params.row["url"]} target="_blank" underline="none">
-          {params.value}
-        </Link>
-      ),
-    },
-    {
-      field: "url",
-    },
-    {
-      field: "state",
-      headerName: "State",
-      width: 140,
-      sortComparator: (v1: string, v2: string): number =>
-        states.find((state: State) => state.name === v1)?.order >
-        states.find((state: State) => state.name === v2)?.order
-          ? 1
-          : -1,
-    },
-    {
-      field: "assignedTo",
-      headerName: "Assigned To",
-      width: 140,
-    },
-    {
-      field: "storyPoints",
-      headerName: "Story Points",
-      width: 110,
-    },
-    {
-      field: "type",
-      headerName: "Type",
-      width: 120,
-    },
-    {
-      field: "tags",
-      headerName: "Tags",
-      width: 280,
-      renderCell: (params: GridRenderCellParams): ReactElement => (
-        <>
-          {params.value
-            ? params.value
-                .split(";")
-                .map((tag: string) => <Chip key={tag} label={tag} />)
-            : ""}
-        </>
-      ),
-    },
-  ];
-
-  const initialState = useMemo<GridInitialState>(() => {
-    const filterModel: GridFilterModel =
-      filter && filter !== "" ? JSON.parse(filter) : undefined;
-    console.log("Filter model:", filterModel);
-    const sortModel: GridSortModel =
-      sort && sort !== ""
-        ? JSON.parse(sort)
-        : [
-            {
-              field: "order",
-              sort: "asc",
-            },
-          ];
-    return {
-      sorting: {
-        sortModel: sortModel,
-      },
-      filter: {
-        filterModel: filterModel,
-      },
-    };
-  }, [filter]);
 
   function handleMoveIteration(): void {
     console.log("handleMoveIteration:", selectionModel);
@@ -371,7 +248,7 @@ function Iteration(): ReactElement {
                 ""
               )}
             </Grid>
-            {currentWorkItemsView && states && initialState ? (
+            {currentWorkItemsView && states ? (
               <>
                 <Grid
                   container
@@ -426,39 +303,11 @@ function Iteration(): ReactElement {
                   sx={{
                     padding: theme.spacing(1, 0),
                   }}>
-                  <DataGrid
-                    autoHeight
-                    checkboxSelection
-                    columns={columns}
-                    columnVisibilityModel={columnVisibilityModel}
-                    components={{ Toolbar: DataGridToolbar }}
-                    initialState={initialState}
-                    pageSize={pageSize}
-                    rows={currentWorkItemsView}
-                    rowsPerPageOptions={[5, 10, 15, 20, 25, 50, 100]}
+                  <WorkItems
+                    states={states}
                     selectionModel={selectionModel}
-                    onPageSizeChange={(newSize: number) => setPageSize(newSize)}
-                    onSelectionModelChange={(
-                      newSelectionModel: GridSelectionModel
-                    ): void => setSelectionModel(newSelectionModel)}
-                    onSortModelChange={(newSortModel: GridSortModel) => {
-                      router.push({
-                        pathname: router.pathname,
-                        query: {
-                          ...router.query,
-                          sort: JSON.stringify(newSortModel),
-                        },
-                      });
-                    }}
-                    onFilterModelChange={(newFilterModel: GridFilterModel) => {
-                      router.push({
-                        pathname: router.pathname,
-                        query: {
-                          ...router.query,
-                          filter: JSON.stringify(newFilterModel),
-                        },
-                      });
-                    }}
+                    workItemsView={currentWorkItemsView}
+                    setSelectionModel={setSelectionModel}
                   />
                 </Grid>
               </>
