@@ -252,7 +252,7 @@ function WorkItems({
                       filter: undefined,
                     },
                   });
-                  router.reload();
+                  setTimeout(() => router.reload(), 500);
                 },
               },
             }}
