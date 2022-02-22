@@ -145,6 +145,14 @@ export class AzureDevOps {
         order: 999,
         url: "",
       });
+      data.push({
+        id: "zyx987",
+        name: "Done",
+        color: "339933",
+        stateCategory: "Closed",
+        order: 999,
+        url: "",
+      });
       return data.filter((state: State) => !state.hidden);
     }
     throw new Error(`Error: ${response.status} - ${response.data}`);

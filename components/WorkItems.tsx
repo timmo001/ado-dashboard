@@ -66,6 +66,10 @@ interface TypeIconMap {
   };
 }
 
+interface StateColorMap {
+  [state: string]: string;
+}
+
 const typeIconMap: TypeIconMap = {
   Bug: { color: red[400], icon: mdiBug },
   Epic: { color: orange[400], icon: mdiBookVariantMultiple },
@@ -127,8 +131,18 @@ function WorkItems({
     };
   }, [columnsVisible, filter, sort]);
 
-  const columns = useMemo<Array<GridColDef>>(() => {
+  const statesColorMap = useMemo<StateColorMap>(() => {
     if (!states) return undefined;
+    let s = {};
+    states.forEach((state: State) => {
+      s[state.name] = `#${state.color}`;
+    });
+    return s;
+  }, [states]);
+
+  const columns = useMemo<Array<GridColDef>>(() => {
+    if (!states || !statesColorMap) return undefined;
+    console.log(statesColorMap);
     return [
       {
         field: "id",
@@ -167,7 +181,7 @@ function WorkItems({
               size={1}
               style={{ marginRight: theme.spacing(0.25) }}
             />
-            {params.value}
+            <span>{params.value}</span>
           </>
         ),
       },
@@ -179,7 +193,12 @@ function WorkItems({
       {
         field: "state",
         headerName: "State",
-        width: 140,
+        width: 160,
+        renderCell: (params: GridRenderCellParams): ReactElement => (
+          <span style={{ color: statesColorMap[params.value] }}>
+            {params.value}
+          </span>
+        ),
         sortComparator: (v1: string, v2: string): number =>
           states.find((state: State) => state.name === v1)?.order >
           states.find((state: State) => state.name === v2)?.order
