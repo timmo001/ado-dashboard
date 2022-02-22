@@ -25,9 +25,10 @@ import {
   mdiClipboardList,
 } from "@mdi/js";
 import Icon from "@mdi/react";
+import ReactHtmlParser from "react-html-parser";
 
 import { State } from "lib/types/azureDevOps";
-import DataGridToolbar from "./DataGridToolbar";
+import DataGridToolbar from "components/DataGridToolbar";
 
 export interface WorkItemsView {
   id: number;
@@ -142,7 +143,6 @@ function WorkItems({
 
   const columns = useMemo<Array<GridColDef>>(() => {
     if (!states || !statesColorMap) return undefined;
-    console.log(statesColorMap);
     return [
       {
         field: "id",
@@ -273,6 +273,9 @@ function WorkItems({
         field: "releaseDetails",
         headerName: "Release Details",
         width: 400,
+        renderCell: (params: GridRenderCellParams): ReactElement => (
+          <span>{ReactHtmlParser(params.value)}</span>
+        ),
       },
     ];
   }, [backlog, states]);
