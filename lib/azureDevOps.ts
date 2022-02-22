@@ -14,6 +14,10 @@ import {
   IterationWorkItems,
   IterationWorkItemWorkItemRelation as IterationWorkItemRelation,
   WorkItemRevision,
+  Process,
+  ProcessWorkItemType,
+  Project,
+  ProcessWorkItemTypeExtended,
 } from "./types/azureDevOps";
 
 export class AzureDevOps {
@@ -122,17 +126,57 @@ export class AzureDevOps {
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
-  async getStates(): Promise<Array<State>> {
+  async getProject(): Promise<Project> {
+    const response = await axios.get<Project>(
+      `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`,
+      { auth: this.auth }
+    );
+    if (response.status == 200) return response.data;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
+  async getProcesses(): Promise<Array<Process>> {
+    const response = await axios.get<ODataResponse<Process>>(
+      `https://dev.azure.com/${this.organization}/_apis/process/processes?api-version=6.0`,
+      { auth: this.auth }
+    );
+    if (response.status == 200) return response.data.value;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+  async getProcess(processId: string): Promise<Process> {
+    const response = await axios.get<Process>(
+      `https://dev.azure.com/${this.organization}/_apis/process/processes/${processId}?api-version=6.0`,
+      { auth: this.auth }
+    );
+    if (response.status == 200) return response.data;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
+  async getProcessTypes(
+    processId: string
+  ): Promise<Array<ProcessWorkItemType>> {
+    const response = await axios.get<ODataResponse<ProcessWorkItemType>>(
+      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes?api-version=6.0`,
+      { auth: this.auth }
+    );
+    if (response.status == 200) return response.data.value;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
+  async getStates(
+    processId: string,
+    processWorkItemTypeId: string
+  ): Promise<Array<State>> {
     const response = await axios.get<ODataResponse<State>>(
-      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/34fdcce2-ba28-43e9-99ec-a1f126565612/workItemTypes/TechnicalTeamAgileDevOps.UserStory/states?api-version=6.0`,
+      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes/${processWorkItemTypeId}/states?api-version=6.0`,
       { auth: this.auth }
     );
     if (response.status == 200) {
       const data = response.data.value;
       data.unshift({
-        id: "abc123",
+        id: "abc000",
         name: "New",
-        color: "b2b2b2",
+        color: "eeeeee",
         stateCategory: "New",
         order: 0,
         url: "",
@@ -141,21 +185,59 @@ export class AzureDevOps {
         id: "zyx987",
         name: "Closed",
         color: "339933",
-        stateCategory: "Closed",
-        order: 999,
-        url: "",
-      });
-      data.push({
-        id: "zyxw9876",
-        name: "Done",
-        color: "339933",
-        stateCategory: "Closed",
+        stateCategory: "Completed",
         order: 999,
         url: "",
       });
       return data.filter((state: State) => !state.hidden);
     }
     throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
+  async getStatesFromProject(): Promise<{
+    states: Array<State>;
+    processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+  }> {
+    const proj: Project = await this.getProject();
+    const process: Process = await this.getProcess(
+      proj.capabilities.processTemplate.templateTypeId
+    );
+
+    let s: Array<State> = [];
+    let pwts: Array<ProcessWorkItemTypeExtended> = [];
+    for (const processWorkItemType of await this.getProcessTypes(process.id)) {
+      for (const state of await this.getStates(
+        process.id,
+        processWorkItemType.id
+      )) {
+        const sId = s.findIndex((st: State) => st.name === state.name);
+        if (sId < 0)
+          s.push({
+            ...state,
+            order:
+              state.stateCategory === "Completed"
+                ? Number(`9${state.order}`)
+                : state.order,
+          });
+        else if (processWorkItemType.name === "User Story") s[sId] = state;
+
+        const pwtId = pwts.findIndex(
+          (pwt: ProcessWorkItemTypeExtended) =>
+            pwt.id === processWorkItemType.id
+        );
+        if (pwtId < 0)
+          pwts.push({
+            ...processWorkItemType,
+            process,
+            states: [state],
+          });
+        else pwts[pwtId].states.push(state);
+      }
+    }
+    return {
+      states: s.sort((a: State, b: State) => (a.order > b.order ? 1 : -1)),
+      processWorkItemTypes: pwts,
+    };
   }
 
   async getIterationWorkItemIds(iterationId: string): Promise<Array<number>> {

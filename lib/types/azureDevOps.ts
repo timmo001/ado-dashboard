@@ -52,6 +52,76 @@ export interface AnalyticsAssignedTo {
   UserName: string;
 }
 
+// Project
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  state: string;
+  capabilities: ProjectCapabilities;
+  revision: number;
+  _links: ProjectLinks;
+  visibility: string;
+  defaultTeam: ProjectDefaultTeam;
+  lastUpdateTime: Date;
+}
+
+export interface ProjectLinks {
+  self: ProjectLinkCollection;
+  collection: ProjectLinkCollection;
+  web: ProjectLinkCollection;
+}
+
+export interface ProjectLinkCollection {
+  href: string;
+}
+
+export interface ProjectCapabilities {
+  processTemplate: ProjectProcessTemplate;
+  versioncontrol: ProjectVersionControl;
+}
+
+export interface ProjectProcessTemplate {
+  templateName: string;
+  templateTypeId: string;
+}
+
+export interface ProjectVersionControl {
+  sourceControlType: string;
+  gitEnabled: string;
+  tfvcEnabled: string;
+}
+
+export interface ProjectDefaultTeam {
+  id: string;
+  name: string;
+  url: string;
+}
+
+// Process
+export interface Process {
+  id: string;
+  description: string;
+  isDefault: boolean;
+  type: string;
+  url: string;
+  name: string;
+}
+
+// Process Work Item Type
+export interface ProcessWorkItemType {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  inherits: string;
+  class: string;
+  color: string;
+  icon: string;
+  isDisabled: boolean;
+}
+
 // Iteration
 export interface Iteration {
   id: string;
@@ -105,6 +175,11 @@ export interface State {
   order: number;
   url: string;
   hidden?: boolean;
+}
+
+export interface ProcessWorkItemTypeExtended extends ProcessWorkItemType {
+  process: Process;
+  states: Array<State>;
 }
 
 // Query

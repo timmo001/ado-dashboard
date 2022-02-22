@@ -22,7 +22,12 @@ import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
 import { groupByKey } from "lib/util";
-import { Iteration, State, WorkItemExpanded } from "lib/types/azureDevOps";
+import {
+  Iteration,
+  ProcessWorkItemTypeExtended,
+  State,
+  WorkItemExpanded,
+} from "lib/types/azureDevOps";
 import { XLSXExport } from "lib/xlsxExport";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
@@ -40,6 +45,8 @@ function Iteration(): ReactElement {
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
+  const [processWorkItemTypes, setProcessWorkItemTypes] =
+    useState<Array<ProcessWorkItemTypeExtended>>();
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -86,7 +93,18 @@ function Iteration(): ReactElement {
             .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
         );
     });
-    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
+
+    azureDevOps
+      .getStatesFromProject()
+      .then(
+        (result: {
+          states: Array<State>;
+          processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+        }) => {
+          setStates(result.states);
+          setProcessWorkItemTypes(result.processWorkItemTypes);
+        }
+      );
   }, [organization, project, personalAccessToken, iteration]);
 
   useEffect(() => {
@@ -314,8 +332,9 @@ function Iteration(): ReactElement {
                     padding: theme.spacing(1, 0),
                   }}>
                   <WorkItems
-                    states={states}
+                    processWorkItemTypes={processWorkItemTypes}
                     selectionModel={selectionModel}
+                    states={states}
                     workItemsView={currentWorkItemsView}
                     setSelectionModel={setSelectionModel}
                   />

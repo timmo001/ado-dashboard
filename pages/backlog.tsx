@@ -21,6 +21,7 @@ import moment from "moment";
 import { AzureDevOps } from "lib/azureDevOps";
 import {
   Iteration as Backlog,
+  ProcessWorkItemTypeExtended,
   State,
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
@@ -40,6 +41,8 @@ function Backlog(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [iterations, setIterations] = useState<Array<Backlog>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
+  const [processWorkItemTypes, setProcessWorkItemTypes] =
+    useState<Array<ProcessWorkItemTypeExtended>>();
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -85,8 +88,25 @@ function Backlog(): ReactElement {
             )
           )
       );
-    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
+
+    azureDevOps
+      .getStatesFromProject()
+      .then(
+        (result: {
+          states: Array<State>;
+          processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+        }) => {
+          setStates(
+            result.states.filter(
+              (state: State) => state.stateCategory !== "Completed"
+            )
+          );
+          setProcessWorkItemTypes(result.processWorkItemTypes);
+        }
+      );
   }, [organization, project, personalAccessToken]);
+
+  console.log("states:", states);
 
   useEffect(() => {
     setup();
@@ -260,8 +280,9 @@ function Backlog(): ReactElement {
                 </Grid>
                 <WorkItems
                   backlog
-                  states={states}
+                  processWorkItemTypes={processWorkItemTypes}
                   selectionModel={selectionModel}
+                  states={states}
                   workItemsView={workItemsView}
                   setSelectionModel={setSelectionModel}
                 />

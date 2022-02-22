@@ -27,7 +27,7 @@ import {
 import Icon from "@mdi/react";
 import ReactHtmlParser from "react-html-parser";
 
-import { State } from "lib/types/azureDevOps";
+import { ProcessWorkItemTypeExtended, State } from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
 
 export interface WorkItemsView {
@@ -54,10 +54,11 @@ export interface WorkItemsView {
 
 interface WorkItemsProps {
   backlog?: boolean;
+  processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
   selectionModel: GridSelectionModel;
-  setSelectionModel: Dispatch<SetStateAction<GridSelectionModel>>;
-  states: Array<State>;
   workItemsView: Array<WorkItemsView>;
+  states: Array<State>;
+  setSelectionModel: Dispatch<SetStateAction<GridSelectionModel>>;
 }
 
 interface TypeIconMap {
@@ -81,10 +82,11 @@ const typeIconMap: TypeIconMap = {
 
 function WorkItems({
   backlog,
+  processWorkItemTypes,
   selectionModel,
-  setSelectionModel,
   states,
   workItemsView,
+  setSelectionModel,
 }: WorkItemsProps): ReactElement {
   const [pageSize, setPageSize] = useState<number>(50);
 
