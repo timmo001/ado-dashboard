@@ -106,6 +106,16 @@ function WorkItems({
       {
         field: "url",
       },
+    ];
+
+    if (backlog)
+      c.push({
+        field: "iteration",
+        headerName: "Iteration",
+        width: 140,
+      });
+
+    c = c.concat([
       {
         field: "state",
         headerName: "State",
@@ -116,16 +126,6 @@ function WorkItems({
             ? 1
             : -1,
       },
-    ];
-
-    if (backlog)
-      c.push({
-        field: "iteration",
-        headerName: "Iteration",
-        width: 140,
-      });
-
-    c =c.concat([
       {
         field: "assignedTo",
         headerName: "Assigned To",
@@ -158,7 +158,7 @@ function WorkItems({
     ]);
 
     return c;
-  }, [backlog]);
+  }, [backlog, states]);
 
   const theme = useTheme();
 
