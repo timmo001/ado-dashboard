@@ -7,6 +7,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import { Chip, CircularProgress, Grid, Link, useTheme } from "@mui/material";
+import { blue, red, indigo, orange, yellow } from "@mui/material/colors";
 import {
   DataGrid,
   GridColDef,
@@ -17,6 +18,13 @@ import {
   GridSelectionModel,
   GridSortModel,
 } from "@mui/x-data-grid";
+import {
+  mdiBook,
+  mdiBookVariantMultiple,
+  mdiBug,
+  mdiClipboardList,
+} from "@mdi/js";
+import Icon from "@mdi/react";
 
 import { State } from "lib/types/azureDevOps";
 import DataGridToolbar from "./DataGridToolbar";
@@ -26,11 +34,11 @@ export interface WorkItemsView {
   order: number;
   title: string;
   url: string;
-  state: string;
+  type: string;
   iteration?: string;
+  state: string;
   assignedTo: string;
   storyPoints: number;
-  type: string;
   tags: string;
   components: string;
   functions: string;
@@ -50,6 +58,21 @@ interface WorkItemsProps {
   states: Array<State>;
   workItemsView: Array<WorkItemsView>;
 }
+
+interface TypeIconMap {
+  [type: string]: {
+    color: string;
+    icon: string;
+  };
+}
+
+const typeIconMap: TypeIconMap = {
+  Bug: { color: red[400], icon: mdiBug },
+  Epic: { color: orange[400], icon: mdiBookVariantMultiple },
+  Feature: { color: indigo[400], icon: mdiBookVariantMultiple },
+  Task: { color: yellow[400], icon: mdiClipboardList },
+  "User Story": { color: blue[400], icon: mdiBook },
+};
 
 function WorkItems({
   backlog,
@@ -133,6 +156,22 @@ function WorkItems({
         width: 400,
       },
       {
+        field: "type",
+        headerName: "Type",
+        width: 140,
+        renderCell: (params: GridRenderCellParams): ReactElement => (
+          <>
+            <Icon
+              color={typeIconMap[params.value].color}
+              path={typeIconMap[params.value].icon}
+              size={1}
+              style={{ marginRight: theme.spacing(0.25) }}
+            />
+            {params.value}
+          </>
+        ),
+      },
+      {
         field: "iteration",
         headerName: "Iteration",
         width: 140,
@@ -156,11 +195,6 @@ function WorkItems({
         field: "storyPoints",
         headerName: "Story Points",
         width: 110,
-      },
-      {
-        field: "type",
-        headerName: "Type",
-        width: 120,
       },
       {
         field: "tags",
