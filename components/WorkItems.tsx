@@ -16,10 +16,10 @@ import {
   GridRenderCellParams,
   GridSelectionModel,
   GridSortModel,
-  GridToolbar,
 } from "@mui/x-data-grid";
 
 import { State } from "lib/types/azureDevOps";
+import DataGridToolbar from "./DataGridToolbar";
 
 export interface WorkItemsView {
   id: number;
@@ -82,7 +82,6 @@ function WorkItems({
           };
     const filterModel: GridFilterModel =
       filter && filter !== "" ? JSON.parse(filter) : undefined;
-    console.log("Filter model:", filterModel);
     const sortModel: GridSortModel =
       sort && sort !== ""
         ? JSON.parse(sort)
@@ -240,7 +239,23 @@ function WorkItems({
             autoHeight
             checkboxSelection
             columns={columns}
-            components={{ Toolbar: GridToolbar }}
+            components={{ Toolbar: DataGridToolbar }}
+            componentsProps={{
+              toolbar: {
+                onResetFilter: () => {
+                  router.push({
+                    pathname: router.pathname,
+                    query: {
+                      ...router.query,
+                      columnsVisible: undefined,
+                      sort: undefined,
+                      filter: undefined,
+                    },
+                  });
+                  router.reload();
+                },
+              },
+            }}
             initialState={initialState}
             pageSize={pageSize}
             rows={workItemsView}

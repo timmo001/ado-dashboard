@@ -91,8 +91,8 @@ function Header(props: HeaderProps): ReactElement {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerToggle}
-            size="large">
+            size="large"
+            onClick={handleDrawerToggle}>
             <Icon path={mdiMenu} size={1} />
           </IconButton>
         </Hidden>
