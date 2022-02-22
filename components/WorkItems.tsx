@@ -82,7 +82,7 @@ function WorkItems({
   }, [filter]);
 
   const columns = useMemo<Array<GridColDef>>(() => {
-    const c = [
+    let c = [
       {
         field: "id",
         headerName: "ID",
@@ -125,7 +125,7 @@ function WorkItems({
         width: 140,
       });
 
-    c.concat([
+    c =c.concat([
       {
         field: "assignedTo",
         headerName: "Assigned To",
