@@ -180,47 +180,47 @@ function WorkItems({
       {
         field: "components",
         headerName: "Components",
-        width: 120,
+        width: 320,
       },
       {
         field: "functions",
         headerName: "Functions",
-        width: 120,
+        width: 320,
       },
       {
         field: "exportList",
         headerName: "Export List",
-        width: 120,
+        width: 240,
       },
       {
         field: "tables",
         headerName: "Tables",
-        width: 120,
+        width: 320,
       },
       {
         field: "fields",
         headerName: "Fields",
-        width: 120,
+        width: 320,
       },
       {
         field: "scripts",
         headerName: "Scripts",
-        width: 120,
+        width: 320,
       },
       {
         field: "files",
         headerName: "Files",
-        width: 120,
+        width: 320,
       },
       {
         field: "misc",
         headerName: "Misc",
-        width: 120,
+        width: 320,
       },
       {
         field: "releaseDetails",
         headerName: "Release Details",
-        width: 120,
+        width: 400,
       },
     ];
   }, [backlog, states]);
