@@ -1,5 +1,5 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
-import { cyan, indigo, purple } from "@mui/material/colors";
+import { cyan, grey, indigo } from "@mui/material/colors";
 
 let theme = createTheme({
   palette: {
@@ -20,7 +20,7 @@ let theme = createTheme({
     MuiLink: {
       styleOverrides: {
         root: {
-          color: purple[400],
+          color: grey[200],
         },
       },
     },
