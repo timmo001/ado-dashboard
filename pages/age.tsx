@@ -6,7 +6,6 @@ import {
   CircularProgress,
   Grid,
   Typography,
-  useTheme,
 } from "@mui/material";
 import {
   Legend,
@@ -18,7 +17,11 @@ import {
   YAxis,
 } from "recharts";
 
-import { AnalyticsWorkItem, State } from "lib/types/azureDevOps";
+import {
+  AnalyticsWorkItem,
+  ProcessWorkItemTypeExtended,
+  State,
+} from "lib/types/azureDevOps";
 import { AzureDevOps } from "lib/azureDevOps";
 import { getChartAnalyticsWorkItemsAge } from "lib/chartData";
 import Layout from "components/Layout";
@@ -56,7 +59,20 @@ function Age(): ReactElement {
       project,
       personalAccessToken
     );
-    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
+    azureDevOps
+      .getStatesFromProject()
+      .then(
+        (result: {
+          states: Array<State>;
+          processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+        }) => {
+          setStates(
+            result.states.filter(
+              (state: State) => state.stateCategory !== "Completed"
+            )
+          );
+        }
+      );
     azureDevOps
       .getAnalyticsWorkItems()
       .then((result: Array<AnalyticsWorkItem>) =>
@@ -72,7 +88,6 @@ function Age(): ReactElement {
   );
 
   const classes = useStyles();
-  const theme = useTheme();
 
   return (
     <Layout classes={classes} title="Age" description="Azure DevOps Dashboard">
