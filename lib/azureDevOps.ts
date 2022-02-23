@@ -283,19 +283,19 @@ export class AzureDevOps {
         data.push(
           ...response.data.value.map((workItem: WorkItem) => {
             order += 1;
+            const iterationIndex =
+              workItem.fields["System.IterationPath"].indexOf("\\");
             return {
               id: workItem.id,
               rev: workItem.rev,
               url: workItem.url,
               ...workItem.fields,
               iteration:
-                workItem.fields["System.IterationPath"] ===
-                "Small Change Technical Team"
-                  ? "Backlog"
-                  : workItem.fields["System.IterationPath"].replace(
-                      "Small Change Technical Team\\",
-                      ""
-                    ),
+                iterationIndex > -1
+                  ? workItem.fields["System.IterationPath"].substring(
+                      iterationIndex + 1
+                    )
+                  : "Backlog",
               order: order,
             };
           })
