@@ -196,7 +196,7 @@ function WorkItems({
       {
         field: "iteration",
         headerName: "Iteration",
-        width:220,
+        width: 220,
       },
       {
         field: "state",
@@ -312,14 +312,14 @@ function WorkItems({
             componentsProps={{
               toolbar: {
                 onResetFilter: () => {
+                  const q = {};
+                  Object.assign(q, router.query);
+                  delete q["columnsVisible"];
+                  delete q["sort"];
+                  delete q["filter"];
                   router.push({
                     pathname: router.pathname,
-                    query: {
-                      ...router.query,
-                      columnsVisible: undefined,
-                      sort: undefined,
-                      filter: undefined,
-                    },
+                    query: q,
                   });
                   setTimeout(() => router.reload(), 500);
                 },

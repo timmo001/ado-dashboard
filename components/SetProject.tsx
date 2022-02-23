@@ -62,7 +62,8 @@ function SetProject(): ReactElement {
   }
 
   function handleConfirmSetProject(): void {
-    const nq = Object.assign(newQuery);
+    const nq = {};
+    Object.assign(nq, newQuery);
     for (const qk of Object.keys(nq)) {
       if (!nq[qk] || nq[qk] === "") delete nq[qk];
     }
