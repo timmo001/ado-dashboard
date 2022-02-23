@@ -179,12 +179,16 @@ function WorkItems({
         width: 140,
         renderCell: (params: GridRenderCellParams): ReactElement => (
           <>
-            <Icon
-              color={typeIconMap[params.value]?.color}
-              path={typeIconMap[params.value]?.icon}
-              size={1}
-              style={{ marginRight: theme.spacing(0.25) }}
-            />
+            {typeIconMap[params.value] ? (
+              <Icon
+                color={typeIconMap[params.value]?.color}
+                path={typeIconMap[params.value]?.icon}
+                size={1}
+                style={{ marginRight: theme.spacing(0.25) }}
+              />
+            ) : (
+              ""
+            )}
             <span>{params.value}</span>
           </>
         ),
