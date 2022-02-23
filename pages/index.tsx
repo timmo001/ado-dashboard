@@ -17,13 +17,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
-import { groupByKey } from "lib/util";
 import {
   AnalyticsWorkItem,
   Iteration,
+  ProcessWorkItemTypeExtended,
   State,
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
@@ -31,6 +30,7 @@ import {
   getChartAnalyticsWorkItems,
   getChartAnalyticsWorkItemsCurrentIteration,
 } from "lib/chartData";
+import { groupByKey } from "lib/util";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
 
@@ -76,7 +76,20 @@ function Dashboard(): ReactElement {
     azureDevOps
       .getIterations()
       .then((result: Array<Iteration>) => setIterations(result));
-    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
+    azureDevOps
+      .getStatesFromProject()
+      .then(
+        (result: {
+          states: Array<State>;
+          processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+        }) => {
+          setStates(
+            result.states.filter(
+              (state: State) => state.stateCategory !== "Completed"
+            )
+          );
+        }
+      );
     azureDevOps
       .getAnalyticsWorkItemsCurrentIteration()
       .then((result: Array<AnalyticsWorkItem>) =>
