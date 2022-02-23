@@ -41,6 +41,7 @@ export interface WorkItemsView {
   assignedTo: string;
   storyPoints: number;
   tags: string;
+  areaPath: string;
   components: string;
   functions: string;
   exportList: string;
@@ -100,6 +101,7 @@ function WorkItems({
         : {
             url: false,
             iteration: backlog ? true : false,
+            areaPath: false,
             components: false,
             functions: false,
             exportList: false,
@@ -178,8 +180,8 @@ function WorkItems({
         renderCell: (params: GridRenderCellParams): ReactElement => (
           <>
             <Icon
-              color={typeIconMap[params.value].color}
-              path={typeIconMap[params.value].icon}
+              color={typeIconMap[params.value]?.color}
+              path={typeIconMap[params.value]?.icon}
               size={1}
               style={{ marginRight: theme.spacing(0.25) }}
             />
@@ -230,6 +232,11 @@ function WorkItems({
               : ""}
           </>
         ),
+      },
+      {
+        field: "areaPath",
+        headerName: "Area Path",
+        width: 320,
       },
       {
         field: "components",

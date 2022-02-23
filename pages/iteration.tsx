@@ -153,6 +153,7 @@ function Iteration(): ReactElement {
       assignedTo: wi["System.AssignedTo"]?.displayName,
       storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
       tags: wi["System.Tags"],
+      areaPath: wi["System.AreaPath"],
       components: wi["Custom.Components"],
       functions: wi["Custom.Functions"],
       exportList: wi["Custom.ExportList"],

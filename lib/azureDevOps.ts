@@ -1,4 +1,4 @@
-import axios, { AxiosBasicCredentials } from "axios";
+import axios, { AxiosBasicCredentials, AxiosResponse } from "axios";
 import moment from "moment";
 
 import {
@@ -24,6 +24,7 @@ export class AzureDevOps {
   private auth: AxiosBasicCredentials;
   private organization: string;
   private project: string;
+  private projectData: Project;
 
   constructor(
     organization: string,
@@ -35,8 +36,45 @@ export class AzureDevOps {
     this.project = project;
   }
 
+  async get<T>(url: string): Promise<AxiosResponse<T, any>> {
+    try {
+      return await axios.get<T>(url, { auth: this.auth });
+    } catch (e) {
+      console.error(e.message, e.response);
+      throw new Error(e);
+    }
+  }
+
+  async patch<T>(url: string, data: unknown): Promise<AxiosResponse<T, any>> {
+    try {
+      return await axios.patch<T>(url, data, {
+        auth: this.auth,
+        headers: {
+          "Content-Type": "application/json-patch+json",
+        },
+      });
+    } catch (e) {
+      console.error(e.message, e.response);
+      throw new Error(e);
+    }
+  }
+
+  async post<T>(url: string, data: unknown): Promise<AxiosResponse<T, any>> {
+    try {
+      return await axios.post<T>(url, data, {
+        auth: this.auth,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (e) {
+      console.error(e.message, e.response);
+      throw new Error(e);
+    }
+  }
+
   async getAnalyticsLeadCycleTime(): Promise<Array<AnalyticsLeadCycleTime>> {
-    const response = await axios.get<ODataResponse<AnalyticsLeadCycleTime>>(
+    const response = await this.get<ODataResponse<AnalyticsLeadCycleTime>>(
       `https://analytics.dev.azure.com/${this.organization}/${
         this.project
       }/_odata/v3.0-preview/WorkItems?
@@ -44,8 +82,7 @@ export class AzureDevOps {
         .subtract(1, "years")
         .format("YYYY")}0101
       &$select=WorkItemId,Title,WorkItemType,State,Priority,Severity,TagNames,AreaSK,CycleTimeDays,LeadTimeDays,CompletedDateSK
-      &$expand=AssignedTo($select=UserName),Iteration($select=IterationPath),Area($select=AreaPath)`,
-      { auth: this.auth }
+      &$expand=AssignedTo($select=UserName),Iteration($select=IterationPath),Area($select=AreaPath)`
     );
     if (response.status == 200) return response.data.value;
     throw new Error(`Error: ${response.status} - ${response.data}`);
@@ -54,7 +91,7 @@ export class AzureDevOps {
   async getAnalyticsWorkItemsCurrentIteration(): Promise<
     Array<AnalyticsWorkItem>
   > {
-    const response = await axios.get<ODataResponse<AnalyticsWorkItem>>(
+    const response = await this.get<ODataResponse<AnalyticsWorkItem>>(
       `https://analytics.dev.azure.com/${this.organization}/${this.project}/_odata/v3.0-preview/WorkItemSnapshot?$apply=filter(
           WorkItemType ne 'Task'
           and StateCategory ne 'Completed'
@@ -66,15 +103,14 @@ export class AzureDevOps {
       /groupby(
           (WorkItemId,Title,DateValue,State,WorkItemType,Priority,CreatedDate,Area/AreaPath,Iteration/IterationPath),
           aggregate($count as Count, StoryPoints with sum as TotalStoryPoints)
-      )`,
-      { auth: this.auth }
+      )`
     );
     if (response.status == 200) return response.data.value;
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getAnalyticsWorkItems(): Promise<Array<AnalyticsWorkItem>> {
-    const response = await axios.get<ODataResponse<AnalyticsWorkItem>>(
+    const response = await this.get<ODataResponse<AnalyticsWorkItem>>(
       `https://analytics.dev.azure.com/${this.organization}/${
         this.project
       }/_odata/v3.0-preview/WorkItemSnapshot?
@@ -87,8 +123,7 @@ export class AzureDevOps {
       /groupby(
           (WorkItemId,Title,DateValue,State,WorkItemType,Priority,CreatedDate,Area/AreaPath,Iteration/IterationPath),
           aggregate($count as Count, StoryPoints with sum as TotalStoryPoints)
-      )`,
-      { auth: this.auth }
+      )`
     );
     if (response.status == 200) {
       const data = response.data.value;
@@ -104,9 +139,8 @@ export class AzureDevOps {
   }
 
   async getIterations(): Promise<Array<Iteration>> {
-    const response = await axios.get<ODataResponse<Iteration>>(
-      `https://dev.azure.com/${this.organization}/${this.project}/_apis/work/teamsettings/iterations?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<ODataResponse<Iteration>>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/work/teamsettings/iterations?api-version=6.0`
     );
     if (response.status == 200) {
       const data = response.data.value;
@@ -127,26 +161,26 @@ export class AzureDevOps {
   }
 
   async getProject(): Promise<Project> {
-    const response = await axios.get<Project>(
-      `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`,
-      { auth: this.auth }
+    const response = await this.get<Project>(
+      `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`
     );
-    if (response.status == 200) return response.data;
+    if (response.status == 200) {
+      this.projectData = response.data;
+      return response.data;
+    }
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getProcesses(): Promise<Array<Process>> {
-    const response = await axios.get<ODataResponse<Process>>(
-      `https://dev.azure.com/${this.organization}/_apis/process/processes?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<ODataResponse<Process>>(
+      `https://dev.azure.com/${this.organization}/_apis/process/processes?api-version=6.0`
     );
     if (response.status == 200) return response.data.value;
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
   async getProcess(processId: string): Promise<Process> {
-    const response = await axios.get<Process>(
-      `https://dev.azure.com/${this.organization}/_apis/process/processes/${processId}?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<Process>(
+      `https://dev.azure.com/${this.organization}/_apis/process/processes/${processId}?api-version=6.0`
     );
     if (response.status == 200) return response.data;
     throw new Error(`Error: ${response.status} - ${response.data}`);
@@ -155,9 +189,8 @@ export class AzureDevOps {
   async getProcessTypes(
     processId: string
   ): Promise<Array<ProcessWorkItemType>> {
-    const response = await axios.get<ODataResponse<ProcessWorkItemType>>(
-      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<ODataResponse<ProcessWorkItemType>>(
+      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes?api-version=6.0`
     );
     if (response.status == 200) return response.data.value;
     throw new Error(`Error: ${response.status} - ${response.data}`);
@@ -167,9 +200,8 @@ export class AzureDevOps {
     processId: string,
     processWorkItemTypeId: string
   ): Promise<Array<State>> {
-    const response = await axios.get<ODataResponse<State>>(
-      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes/${processWorkItemTypeId}/states?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<ODataResponse<State>>(
+      `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes/${processWorkItemTypeId}/states?api-version=6.0`
     );
     if (response.status == 200) {
       const data = response.data.value;
@@ -241,9 +273,8 @@ export class AzureDevOps {
   }
 
   async getIterationWorkItemIds(iterationId: string): Promise<Array<number>> {
-    const response = await axios.get<IterationWorkItems>(
-      `https://dev.azure.com/${this.organization}/${this.project}/_apis/work/teamsettings/iterations/${iterationId}/workItems?api-version=6.0`,
-      { auth: this.auth }
+    const response = await this.get<IterationWorkItems>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/work/teamsettings/iterations/${iterationId}/workItems?api-version=6.0`
     );
     if (response.status == 200)
       return response.data.workItemRelations.map(
@@ -252,10 +283,20 @@ export class AzureDevOps {
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
-  async getWorkItemIds(query: string): Promise<Array<number>> {
-    const response = await axios.get<Query>(
-      `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql/${query}?api-version=6.0`,
-      { auth: this.auth }
+  async getWorkItemIds(
+    areaPath: string = this.project,
+    removeClosed: boolean = false,
+    removeRemoved: boolean = false
+  ): Promise<Array<number>> {
+    const response = await this.post<Query>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=6.0`,
+      {
+        query: `Select [System.Id] From WorkItems Where [System.TeamProject] = '${
+          this.project
+        }' AND [System.AreaPath] = '${areaPath}' ${
+          removeClosed ? "AND [State] <> 'Closed'" : ""
+        } ${removeRemoved ? "AND [State] <> 'Removed'" : ""}`,
+      }
     );
     if (response.status == 200)
       return response.data.workItems.map(
@@ -273,11 +314,10 @@ export class AzureDevOps {
       order = 0;
     for (i = 0, j = ids.length; i < j; i += chunk) {
       idsChunked = ids.slice(i, i + chunk);
-      const response = await axios.get<ODataResponse<WorkItem>>(
+      const response = await this.get<ODataResponse<WorkItem>>(
         `https://dev.azure.com/${this.organization}/${
           this.project
-        }/_apis/wit/workItems?ids=${idsChunked.join(",")}`,
-        { auth: this.auth }
+        }/_apis/wit/workItems?ids=${idsChunked.join(",")}`
       );
       if (response.status == 200)
         data.push(
@@ -311,15 +351,9 @@ export class AzureDevOps {
     validateOnly: boolean = false
   ): Promise<void> {
     console.log("updateWorkItem:", id, workItemRevision);
-    const response = await axios.patch<WorkItem>(
+    const response = await this.patch<WorkItem>(
       `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/workItems/${id}?api-version=6.0&validateOnly=${validateOnly}`,
-      workItemRevision,
-      {
-        auth: this.auth,
-        headers: {
-          "Content-Type": "application/json-patch+json",
-        },
-      }
+      workItemRevision
     );
     if (response.status === 200) {
       console.log("Response: ", response.status, response.data);

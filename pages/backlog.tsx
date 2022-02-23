@@ -48,7 +48,7 @@ function Backlog(): ReactElement {
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, query } =
+  const { personalAccessToken, organization, project, areaPath } =
     router.query as NodeJS.Dict<string>;
 
   const setup = useCallback(() => {
@@ -58,7 +58,6 @@ function Backlog(): ReactElement {
     if (!project || project === "") missingParameters.push("project");
     if (!personalAccessToken || personalAccessToken === "")
       missingParameters.push("personalAccessToken");
-    if (!query || query === "") missingParameters.push("query");
     if (missingParameters.length > 0) {
       setAlert(
         `Missing required query parameter${
@@ -74,19 +73,11 @@ function Backlog(): ReactElement {
       setIterations(result);
     });
     azureDevOps
-      .getWorkItemIds(query)
+      .getWorkItemIds(areaPath, true, true)
       .then((ids: Array<number>) =>
         azureDevOps
           .getWorkItems(ids)
-          .then((result: Array<WorkItemExpanded>) =>
-            setWorkItems(
-              result.filter(
-                (wi: WorkItemExpanded) =>
-                  wi["System.State"] !== "Closed" &&
-                  wi["System.State"] !== "Removed"
-              )
-            )
-          )
+          .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
       );
 
     azureDevOps
@@ -104,13 +95,11 @@ function Backlog(): ReactElement {
           setProcessWorkItemTypes(result.processWorkItemTypes);
         }
       );
-  }, [organization, project, personalAccessToken]);
-
-  console.log("states:", states);
+  }, [areaPath, organization, project, personalAccessToken]);
 
   useEffect(() => {
     setup();
-  }, [organization, project, personalAccessToken]);
+  }, [areaPath, organization, project, personalAccessToken]);
 
   const currentIteration = useMemo<Backlog>(() => {
     if (!iterations) return undefined;
@@ -154,6 +143,7 @@ function Backlog(): ReactElement {
       assignedTo: wi["System.AssignedTo"]?.displayName,
       storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
       tags: wi["System.Tags"],
+      areaPath: wi["System.AreaPath"],
       components: wi["Custom.Components"],
       functions: wi["Custom.Functions"],
       exportList: wi["Custom.ExportList"],

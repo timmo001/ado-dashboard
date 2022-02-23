@@ -187,9 +187,9 @@ export interface Query {
   queryType: string;
   queryResultType: string;
   asOf: Date;
-  columns: QueryColumn[];
-  sortColumns: QuerySortColumn[];
-  workItems: QueryWorkItem[];
+  columns: Array<QueryColumn>;
+  sortColumns: Array<QuerySortColumn>;
+  workItems: Array<QueryWorkItem>;
 }
 
 export interface QueryColumn {

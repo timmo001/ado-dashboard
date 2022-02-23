@@ -47,7 +47,7 @@ function Dashboard(): ReactElement {
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
 
   const router = useRouter();
-  const { personalAccessToken, organization, project, query } =
+  const { personalAccessToken, organization, project, areaPath } =
     router.query as NodeJS.Dict<string>;
 
   useEffect(() => {
@@ -57,7 +57,6 @@ function Dashboard(): ReactElement {
     if (!project || project === "") missingParameters.push("project");
     if (!personalAccessToken || personalAccessToken === "")
       missingParameters.push("personalAccessToken");
-    if (!query || query === "") missingParameters.push("query");
     if (missingParameters.length > 0) {
       setAlert(
         `Missing required query parameter${
@@ -101,13 +100,13 @@ function Dashboard(): ReactElement {
         setAnalyticsWorkItems(result)
       );
     azureDevOps
-      .getWorkItemIds(query)
+      .getWorkItemIds(areaPath, true, true)
       .then((ids: Array<number>) =>
         azureDevOps
           .getWorkItems(ids)
           .then((result: Array<WorkItemExpanded>) => setWorkItems(result))
       );
-  }, [organization, project, personalAccessToken]);
+  }, [areaPath, organization, project, personalAccessToken]);
 
   const chartAnalyticsWorkItemsCurrentIteration = useMemo<
     Array<{ [key: string]: string | number }>
@@ -192,7 +191,7 @@ function Dashboard(): ReactElement {
           <Typography component="h3" gutterBottom variant="h4">
             Backlog
           </Typography>
-          {itemsByStateBacklog ? (
+          {itemsByStateBacklog && states ? (
             <Grid
               container
               direction="row"
