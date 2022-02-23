@@ -24,7 +24,6 @@ export class AzureDevOps {
   private auth: AxiosBasicCredentials;
   private organization: string;
   private project: string;
-  private projectData: Project;
 
   constructor(
     organization: string,
@@ -40,7 +39,7 @@ export class AzureDevOps {
     try {
       return await axios.get<T>(url, { auth: this.auth });
     } catch (e) {
-      console.error(e.message, e.response);
+      console.error(e);
       throw new Error(e);
     }
   }
@@ -54,7 +53,7 @@ export class AzureDevOps {
         },
       });
     } catch (e) {
-      console.error(e.message, e.response);
+      console.error(e);
       throw new Error(e);
     }
   }
@@ -68,7 +67,7 @@ export class AzureDevOps {
         },
       });
     } catch (e) {
-      console.error(e.message, e.response);
+      console.error(e);
       throw new Error(e);
     }
   }
@@ -147,7 +146,7 @@ export class AzureDevOps {
       data.unshift({
         id: "",
         name: "Backlog",
-        path: data[0].path.substring(0, data[0].path.indexOf("\\")),
+        path: data[0]?.path.substring(0, data[0].path.indexOf("\\")),
         attributes: {
           startDate: "",
           finishDate: "",
@@ -164,10 +163,7 @@ export class AzureDevOps {
     const response = await this.get<Project>(
       `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`
     );
-    if (response.status == 200) {
-      this.projectData = response.data;
-      return response.data;
-    }
+    if (response.status == 200) return response.data;
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 

@@ -118,7 +118,7 @@ function Iteration(): ReactElement {
     );
     return iterations.map((i: Iteration) => ({
       id: i.id,
-      label: `${i.id === ci.id ? `(Current) ` : ""}${i.name}${
+      label: `${i.id === ci?.id ? `(Current) ` : ""}${i.name}${
         i.attributes.startDate
           ? ` (${moment(i.attributes.startDate).format(
               "DD/MM/YYYY"
