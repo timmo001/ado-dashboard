@@ -10,4 +10,5 @@ The requirements are:
 
 - Analytics (Read)
 - Graph (Read)
+- Project and Team (Read)
 - Work Items (Read, Write & Manage)
