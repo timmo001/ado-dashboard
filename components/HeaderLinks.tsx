@@ -4,17 +4,17 @@ import { useRouter } from "next/router";
 import { List, ListItem, Button } from "@mui/material";
 import clsx from "clsx";
 
-import ChangeProject from "./ChangeProject";
+import SetProject from "./SetProject";
 import useStyles from "assets/jss/components/headerLinks";
 
 function HeaderLinks(): ReactElement {
-  const [changeProject, setChangeProject] = useState<boolean>(false);
+  const [setProject, setSetProject] = useState<boolean>(false);
 
   const router = useRouter();
   const classes = useStyles();
 
-  function handleChangeProject(): void {
-    setChangeProject(true);
+  function handleSetProject(): void {
+    setSetProject(true);
   }
 
   return (
@@ -24,8 +24,8 @@ function HeaderLinks(): ReactElement {
           <Button
             variant="outlined"
             className={classes.navLink}
-            onClick={handleChangeProject}>
-            <span className={classes.listItemText}>Change Project</span>
+            onClick={handleSetProject}>
+            <span className={classes.listItemText}>Set Project</span>
           </Button>
         </ListItem>
         <ListItem className={clsx(classes.listItem, classes.divider)} />
@@ -85,7 +85,7 @@ function HeaderLinks(): ReactElement {
           </Link>
         </ListItem>
       </List>
-      {changeProject ? <ChangeProject /> : ""}
+      {setProject ? <SetProject /> : ""}
     </>
   );
 }

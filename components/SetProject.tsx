@@ -35,7 +35,7 @@ const steps: Array<Step> = [
   { label: "Area Path", value: "areaPath" },
 ];
 
-function ChangeProject(): ReactElement {
+function SetProject(): ReactElement {
   const [newQuery, setNewQuery] = useState<NodeJS.Dict<string>>();
   const [currentStep, setCurrentStep] = useState<Step>(steps[0]);
 
@@ -57,11 +57,11 @@ function ChangeProject(): ReactElement {
     [currentStep]
   );
 
-  function handleCloseChangeProject(): void {
+  function handleCloseSetProject(): void {
     setTimeout(() => router.reload(), 500);
   }
 
-  function handleConfirmChangeProject(): void {
+  function handleConfirmSetProject(): void {
     const nq = Object.assign(newQuery);
     for (const qk of Object.keys(nq)) {
       if (!nq[qk] || nq[qk] === "") delete nq[qk];
@@ -70,7 +70,7 @@ function ChangeProject(): ReactElement {
       pathname: router.pathname,
       query: nq,
     });
-    handleCloseChangeProject();
+    handleCloseSetProject();
   }
 
   function handleGoToPreviousStep(): void {
@@ -91,7 +91,7 @@ function ChangeProject(): ReactElement {
       maxWidth="md"
       open
       scroll="body"
-      onClose={handleCloseChangeProject}>
+      onClose={handleCloseSetProject}>
       <DialogTitle>Change Project</DialogTitle>
       {newQuery ? (
         <>
@@ -161,11 +161,11 @@ function ChangeProject(): ReactElement {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseChangeProject}>Cancel</Button>
+            <Button onClick={handleCloseSetProject}>Cancel</Button>
             {currentStepIndex === steps.length - 1 ? (
               <>
                 <Button onClick={handleGoToPreviousStep}>Previous</Button>
-                <Button onClick={handleConfirmChangeProject}>Confirm</Button>
+                <Button onClick={handleConfirmSetProject}>Confirm</Button>
               </>
             ) : (
               <>
@@ -191,4 +191,4 @@ function ChangeProject(): ReactElement {
   );
 }
 
-export default ChangeProject;
+export default SetProject;
