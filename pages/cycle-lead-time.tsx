@@ -17,14 +17,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import moment from "moment";
 
+import { AnalyticsLeadCycleTime, ProcessWorkItemTypeExtended, State } from "lib/types/azureDevOps";
 import { AzureDevOps } from "lib/azureDevOps";
-import { groupByKey } from "lib/util";
-import { AnalyticsLeadCycleTime, State } from "lib/types/azureDevOps";
+import { getChartAnalyticsLeadCycleTime } from "lib/chartData";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
-import { getChartAnalyticsLeadCycleTime } from "lib/chartData";
 
 function CycleLeadTime(): ReactElement {
   const [alert, setAlert] = useState<string>();
@@ -58,7 +56,20 @@ function CycleLeadTime(): ReactElement {
       project,
       personalAccessToken
     );
-    azureDevOps.getStates().then((result: Array<State>) => setStates(result));
+    azureDevOps
+      .getStatesFromProject()
+      .then(
+        (result: {
+          states: Array<State>;
+          processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
+        }) => {
+          setStates(
+            result.states.filter(
+              (state: State) => state.stateCategory !== "Completed"
+            )
+          );
+        }
+      );
     azureDevOps
       .getAnalyticsLeadCycleTime()
       .then((result: Array<AnalyticsLeadCycleTime>) =>
