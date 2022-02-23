@@ -196,7 +196,7 @@ function WorkItems({
       {
         field: "iteration",
         headerName: "Iteration",
-        width: 140,
+        width:220,
       },
       {
         field: "state",
