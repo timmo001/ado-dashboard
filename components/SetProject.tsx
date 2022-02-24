@@ -57,7 +57,12 @@ function SetProject(): ReactElement {
   }, [router.query]);
 
   useEffect(() => {
-    if (!newQuery || !newQuery.personalAccessToken || !newQuery.organization)
+    if (
+      !newQuery ||
+      !newQuery.personalAccessToken ||
+      !newQuery.organization ||
+      currentStep.label !== "Project"
+    )
       return;
     const azureDevOps = new AzureDevOps(
       newQuery.personalAccessToken,
@@ -66,14 +71,15 @@ function SetProject(): ReactElement {
     azureDevOps.getProjects().then((result: Array<Project>) => {
       setProjects(result);
     });
-  }, [newQuery]);
+  }, [currentStep, newQuery]);
 
   useEffect(() => {
     if (
       !newQuery ||
       !newQuery.personalAccessToken ||
       !newQuery.organization ||
-      !newQuery.project
+      !newQuery.project ||
+      currentStep.label !== "Area Path"
     )
       return;
     const azureDevOps = new AzureDevOps(
@@ -84,7 +90,7 @@ function SetProject(): ReactElement {
     azureDevOps.getAreaPaths().then((result: Array<AreaPath>) => {
       setAreaPaths(result);
     });
-  }, [newQuery]);
+  }, [currentStep, newQuery]);
 
   const currentStepIndex = useMemo<number>(
     () => steps.findIndex((step: Step) => step.value === currentStep.value),
@@ -123,6 +129,12 @@ function SetProject(): ReactElement {
   }
 
   function handleGoToNextStep(): void {
+    const nq = {};
+    Object.assign(nq, newQuery);
+    for (let i = currentStepIndex + 1; i < steps.length - currentStepIndex; i++)
+      nq[steps[i].value] = "";
+
+    setNewQuery(nq);
     setCurrentStep(steps[currentStepIndex + 1]);
   }
 
@@ -141,7 +153,6 @@ function SetProject(): ReactElement {
       {newQuery ? (
         <>
           <DialogContent>
-            {/* <DialogContentText>Lorem ipsum.</DialogContentText> */}
             <Grid container direction="row">
               <Grid
                 item
