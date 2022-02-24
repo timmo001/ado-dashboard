@@ -1,13 +1,14 @@
 import React, { ReactElement, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   AppBar,
-  Button,
   Drawer,
   Hidden,
   IconButton,
   PropTypes,
   Toolbar,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { mdiMenu } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -34,6 +35,9 @@ interface HeaderProps {
 function Header(props: HeaderProps): ReactElement {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const router = useRouter();
+  const { project } = router.query as NodeJS.Dict<string>;
 
   useEffect(() => {
     if (props.changeColorOnScroll) {
@@ -71,6 +75,8 @@ function Header(props: HeaderProps): ReactElement {
   };
 
   const { color, rightLinks, brand, fixed, absolute } = props;
+
+  const theme = useTheme();
   return (
     <AppBar
       className={clsx({
@@ -83,6 +89,12 @@ function Header(props: HeaderProps): ReactElement {
       <Toolbar className={classes.container}>
         <Typography className={classes.title} component="div" variant="h4">
           {brand}
+        </Typography>
+        <Typography
+          component="span"
+          variant="h6"
+          sx={{ marginLeft: theme.spacing(2) }}>
+          {project}
         </Typography>
         <Hidden xlDown implementation="css">
           {rightLinks}
