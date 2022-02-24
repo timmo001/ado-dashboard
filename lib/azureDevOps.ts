@@ -282,7 +282,8 @@ export class AzureDevOps {
   async getWorkItemIds(
     areaPath: string = this.project,
     removeClosed: boolean = false,
-    removeRemoved: boolean = false
+    removeRemoved: boolean = false,
+    removeDone: boolean = false
   ): Promise<Array<number>> {
     const response = await this.post<Query>(
       `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=6.0`,
@@ -291,7 +292,9 @@ export class AzureDevOps {
           this.project
         }' AND [System.AreaPath] = '${areaPath}' ${
           removeClosed ? "AND [State] <> 'Closed'" : ""
-        } ${removeRemoved ? "AND [State] <> 'Removed'" : ""}`,
+        } ${removeRemoved ? "AND [State] <> 'Removed'" : ""} ${
+          removeDone ? "AND [State] <> 'Done'" : ""
+        }`,
       }
     );
     if (response.status == 200)

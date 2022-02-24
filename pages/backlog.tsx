@@ -73,7 +73,7 @@ function Backlog(): ReactElement {
       setIterations(result);
     });
     azureDevOps
-      .getWorkItemIds(areaPath, true, true)
+      .getWorkItemIds(areaPath, true, true, true)
       .then((ids: Array<number>) =>
         azureDevOps
           .getWorkItems(ids)
