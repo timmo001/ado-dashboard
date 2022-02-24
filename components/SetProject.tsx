@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Grid,
   TextField,
@@ -23,6 +22,9 @@ import {
   TimelineSeparator,
 } from "@mui/lab";
 
+import { AzureDevOps } from "lib/azureDevOps";
+import { AreaPath, Project } from "lib/types/azureDevOps";
+
 interface Step {
   label: string;
   value: string;
@@ -36,8 +38,10 @@ const steps: Array<Step> = [
 ];
 
 function SetProject(): ReactElement {
-  const [newQuery, setNewQuery] = useState<NodeJS.Dict<string>>();
+  const [areaPaths, setAreaPaths] = useState<Array<AreaPath>>();
   const [currentStep, setCurrentStep] = useState<Step>(steps[0]);
+  const [newQuery, setNewQuery] = useState<NodeJS.Dict<string>>();
+  const [projects, setProjects] = useState<Array<Project>>();
 
   const router = useRouter();
 
@@ -52,10 +56,50 @@ function SetProject(): ReactElement {
     });
   }, [router.query]);
 
+  useEffect(() => {
+    if (!newQuery || !newQuery.personalAccessToken || !newQuery.organization)
+      return;
+    const azureDevOps = new AzureDevOps(
+      newQuery.personalAccessToken,
+      newQuery.organization
+    );
+    azureDevOps.getProjects().then((result: Array<Project>) => {
+      setProjects(result);
+    });
+  }, [newQuery]);
+
+  useEffect(() => {
+    if (
+      !newQuery ||
+      !newQuery.personalAccessToken ||
+      !newQuery.organization ||
+      !newQuery.project
+    )
+      return;
+    const azureDevOps = new AzureDevOps(
+      newQuery.personalAccessToken,
+      newQuery.organization,
+      newQuery.project
+    );
+    azureDevOps.getAreaPaths().then((result: Array<AreaPath>) => {
+      setAreaPaths(result);
+    });
+  }, [newQuery]);
+
   const currentStepIndex = useMemo<number>(
     () => steps.findIndex((step: Step) => step.value === currentStep.value),
     [currentStep]
   );
+
+  const projectsPicker = useMemo<Array<string>>(() => {
+    if (!projects) return undefined;
+    return projects.map((project: Project) => project.name);
+  }, [projects]);
+
+  const areaPathPicker = useMemo<Array<string>>(() => {
+    if (!areaPaths) return undefined;
+    return areaPaths.map((areaPath: AreaPath) => areaPath.path);
+  }, [areaPaths]);
 
   function handleCloseSetProject(): void {
     setTimeout(() => router.reload(), 500);
@@ -129,35 +173,52 @@ function SetProject(): ReactElement {
                 container
                 alignContent="center"
                 justifyContent="center">
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  label={currentStep.label}
-                  value={newQuery[currentStep.value]}
-                  onChange={(event: ChangeEvent<HTMLInputElement>): void => {
-                    setNewQuery({
-                      ...newQuery,
-                      [currentStep.value]: event.target.value,
-                    });
-                  }}
-                />
-                {/* <Autocomplete
-                  disableClearable
-                  id="new-iteration"
-                  options={iterationsPicker}
-                  value={newIteration}
-                  onChange={(_event, newValue: Picker) => {
-                    setNewIteration(
-                      iterationsPicker.find((it: Picker) => it.id === newValue.id)
-                    );
-                  }}
-                  renderInput={(params): JSX.Element => (
-                    <TextField {...params} label="New Iteration" />
-                  )}
-                  sx={{
-                    margin: theme.spacing(3, 0.5, 0),
-                  }}
-                /> */}
+                {currentStep.label === "Project" && projectsPicker ? (
+                  <Autocomplete
+                    disableClearable
+                    fullWidth
+                    options={projectsPicker}
+                    value={newQuery[currentStep.value]}
+                    onChange={(_event, newValue: string) => {
+                      setNewQuery({
+                        ...newQuery,
+                        [currentStep.value]: newValue,
+                      });
+                    }}
+                    renderInput={(params): JSX.Element => (
+                      <TextField {...params} label={currentStep.label} />
+                    )}
+                  />
+                ) : currentStep.label === "Area Path" && areaPathPicker ? (
+                  <Autocomplete
+                    disableClearable
+                    fullWidth
+                    options={areaPathPicker}
+                    value={newQuery[currentStep.value]}
+                    onChange={(_event, newValue: string) => {
+                      setNewQuery({
+                        ...newQuery,
+                        [currentStep.value]: newValue,
+                      });
+                    }}
+                    renderInput={(params): JSX.Element => (
+                      <TextField {...params} label={currentStep.label} />
+                    )}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    label={currentStep.label}
+                    value={newQuery[currentStep.value]}
+                    onChange={(event: ChangeEvent<HTMLInputElement>): void => {
+                      setNewQuery({
+                        ...newQuery,
+                        [currentStep.value]: event.target.value,
+                      });
+                    }}
+                  />
+                )}
               </Grid>
             </Grid>
           </DialogContent>

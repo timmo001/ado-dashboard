@@ -66,11 +66,11 @@ function Dashboard(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data:", organization, project);
+    console.log("Get data:", { organization, project, areaPath });
     const azureDevOps = new AzureDevOps(
+      personalAccessToken,
       organization,
-      project,
-      personalAccessToken
+      project
     );
     azureDevOps
       .getIterations()

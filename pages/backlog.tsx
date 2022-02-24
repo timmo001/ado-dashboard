@@ -26,15 +26,11 @@ import {
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
 import { groupByKey } from "lib/util";
+import { Picker } from "lib/types/general";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
 import WorkItems, { WorkItemsView } from "components/WorkItems";
-
-export interface Picker {
-  id: string;
-  label: string;
-}
 
 let azureDevOps: AzureDevOps;
 function Backlog(): ReactElement {
@@ -67,8 +63,8 @@ function Backlog(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data:", organization, project);
-    azureDevOps = new AzureDevOps(organization, project, personalAccessToken);
+    console.log("Get data:", { organization, project, areaPath });
+    azureDevOps = new AzureDevOps(personalAccessToken, organization, project);
     azureDevOps.getIterations().then((result: Array<Backlog>) => {
       setIterations(result);
     });

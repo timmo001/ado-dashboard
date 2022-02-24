@@ -28,16 +28,12 @@ import {
   State,
   WorkItemExpanded,
 } from "lib/types/azureDevOps";
+import { Picker } from "lib/types/general";
 import { XLSXExport } from "lib/xlsxExport";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
 import WorkItems, { WorkItemsView } from "components/WorkItems";
-
-export interface Picker {
-  id: string;
-  label: string;
-}
 
 let azureDevOps: AzureDevOps;
 function Iteration(): ReactElement {
@@ -71,10 +67,10 @@ function Iteration(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data:", organization, project);
+    console.log("Get data:", { organization, project });
     const it = iteration && iteration !== "" ? iteration : "current";
     console.log("Iteration:", it);
-    azureDevOps = new AzureDevOps(organization, project, personalAccessToken);
+    azureDevOps = new AzureDevOps(personalAccessToken, organization, project);
     azureDevOps.getIterations().then((result: Array<Iteration>) => {
       setIterations(result);
       const foundIteration = result.find((i: Iteration) =>

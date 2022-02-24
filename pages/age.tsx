@@ -1,12 +1,7 @@
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import {
-  Alert,
-  CircularProgress,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Alert, CircularProgress, Grid, Typography } from "@mui/material";
 import {
   Legend,
   Line,
@@ -53,11 +48,11 @@ function Age(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data:", organization, project);
+    console.log("Get data:", { organization, project });
     const azureDevOps = new AzureDevOps(
+      personalAccessToken,
       organization,
-      project,
-      personalAccessToken
+      project
     );
     azureDevOps
       .getStatesFromProject()

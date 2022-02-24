@@ -122,6 +122,48 @@ export interface ProcessWorkItemType {
   isDisabled: boolean;
 }
 
+// Classification Node
+export interface ClassificationNode {
+  id: number;
+  identifier: string;
+  name: string;
+  structureType: StructureType;
+  hasChildren: boolean;
+  children: ClassificationNodeChild[];
+  path: string;
+  url: string;
+}
+
+export interface ClassificationNodeChild {
+  id: number;
+  identifier: string;
+  name: string;
+  structureType: StructureType;
+  hasChildren: boolean;
+  children?: ClassificationNodeChild[];
+  path: string;
+  url: string;
+  attributes?: ClassificationNodeAttributes;
+}
+
+export interface ClassificationNodeAttributes {
+  startDate: Date;
+  finishDate: Date;
+}
+
+export enum StructureType {
+  Area = "area",
+  Iteration = "iteration",
+}
+
+// Area Path
+export interface AreaPath {
+  id: number;
+  name: string;
+  path: string;
+  url: string;
+}
+
 // Iteration
 export interface Iteration {
   id: string;

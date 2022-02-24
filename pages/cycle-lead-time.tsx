@@ -18,7 +18,11 @@ import {
   YAxis,
 } from "recharts";
 
-import { AnalyticsLeadCycleTime, ProcessWorkItemTypeExtended, State } from "lib/types/azureDevOps";
+import {
+  AnalyticsLeadCycleTime,
+  ProcessWorkItemTypeExtended,
+  State,
+} from "lib/types/azureDevOps";
 import { AzureDevOps } from "lib/azureDevOps";
 import { getChartAnalyticsLeadCycleTime } from "lib/chartData";
 import Layout from "components/Layout";
@@ -50,11 +54,11 @@ function CycleLeadTime(): ReactElement {
       return;
     }
     setAlert(undefined);
-    console.log("Get data:", organization, project);
+    console.log("Get data:", { organization, project });
     const azureDevOps = new AzureDevOps(
+      personalAccessToken,
       organization,
-      project,
-      personalAccessToken
+      project
     );
     azureDevOps
       .getStatesFromProject()

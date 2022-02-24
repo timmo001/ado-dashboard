@@ -12,7 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-import { Picker } from "pages/iteration";
+import { Picker } from "lib/types/general";
 
 interface MoveIterationProps {
   iterationsPicker: Array<Picker>;

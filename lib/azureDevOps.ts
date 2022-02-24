@@ -18,6 +18,10 @@ import {
   ProcessWorkItemType,
   Project,
   ProcessWorkItemTypeExtended,
+  ClassificationNode,
+  AreaPath,
+  StructureType,
+  ClassificationNodeChild,
 } from "./types/azureDevOps";
 
 export class AzureDevOps {
@@ -26,9 +30,9 @@ export class AzureDevOps {
   private project: string;
 
   constructor(
+    personalAccessToken: string,
     organization: string,
-    project: string,
-    personalAccessToken: string
+    project?: string
   ) {
     this.auth = { username: personalAccessToken, password: "" };
     this.organization = organization;
@@ -159,11 +163,51 @@ export class AzureDevOps {
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
+  async getProjects(): Promise<Array<Project>> {
+    const response = await this.get<ODataResponse<Project>>(
+      `https://dev.azure.com/${this.organization}/_apis/projects?api-version=6.0`
+    );
+    if (response.status == 200) return response.data.value;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
   async getProject(): Promise<Project> {
     const response = await this.get<Project>(
       `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`
     );
     if (response.status == 200) return response.data;
+    throw new Error(`Error: ${response.status} - ${response.data}`);
+  }
+
+  getChildPath(node: ClassificationNodeChild): Array<AreaPath> {
+    let childPaths: Array<AreaPath> = [];
+    if (node.structureType === StructureType.Area) {
+      childPaths.push({
+        id: node.id,
+        name: node.name,
+        path: node.path.substring(1).replace("\\Area", ""),
+        url: node.url,
+      });
+      if (node.hasChildren && node.children.length > 0) {
+        for (const childNode of node.children) {
+          childPaths = childPaths.concat(this.getChildPath(childNode));
+        }
+      }
+    }
+    return childPaths;
+  }
+
+  async getAreaPaths(): Promise<Array<AreaPath>> {
+    const response = await this.get<ODataResponse<ClassificationNode>>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/classificationnodes?$depth=8&api-version=6.0`
+    );
+    if (response.status == 200) {
+      let paths: Array<AreaPath> = [];
+      for (const node of response.data.value) {
+        paths = paths.concat(this.getChildPath(node));
+      }
+      return paths;
+    }
     throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
