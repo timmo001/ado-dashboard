@@ -20,16 +20,28 @@ import {
 } from "@mui/x-data-grid";
 import {
   mdiBook,
+  mdiBookLockOutline,
   mdiBookOpenPageVariantOutline,
   mdiBookVariantMultiple,
   mdiBug,
+  mdiCheckAll,
+  mdiCheckboxMarked,
+  mdiCheckCircle,
+  mdiCheckOutline,
   mdiClipboardList,
   mdiFlask,
+  mdiFlaskRoundBottom,
+  mdiMessage,
+  mdiMessageDraw,
+  mdiNewspaperVariantOutline,
+  mdiProgressClock,
+  mdiProgressPencil,
+  mdiTestTube,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import ReactHtmlParser from "react-html-parser";
 
-import { ProcessWorkItemTypeExtended, State } from "lib/types/azureDevOps";
+import { State } from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
 
 export interface WorkItemsView {
@@ -63,18 +75,22 @@ interface WorkItemsProps {
   setSelectionModel: Dispatch<SetStateAction<GridSelectionModel>>;
 }
 
-interface TypeIconMap {
+interface TypeMap {
   [type: string]: {
     color: string;
     icon: string;
   };
 }
 
+interface StateIconMap {
+  [state: string]: string;
+}
+
 interface StateColorMap {
   [state: string]: string;
 }
 
-const typeIconMap: TypeIconMap = {
+const typeMap: TypeMap = {
   Bug: { color: red[400], icon: mdiBug },
   "Enabler Story": { color: cyan[400], icon: mdiBookOpenPageVariantOutline },
   Epic: { color: orange[400], icon: mdiBookVariantMultiple },
@@ -82,6 +98,22 @@ const typeIconMap: TypeIconMap = {
   Task: { color: yellow[400], icon: mdiClipboardList },
   "Test Case": { color: indigo[400], icon: mdiFlask },
   "User Story": { color: blue[400], icon: mdiBook },
+};
+
+const stateIconMap: StateIconMap = {
+  Active: mdiProgressPencil,
+  Closed: mdiBookLockOutline,
+  Done: mdiCheckOutline,
+  "In Code Review": mdiMessageDraw,
+  "In Development": mdiProgressPencil,
+  "In Review": mdiMessage,
+  "In Test": mdiTestTube,
+  "In UAT": mdiFlaskRoundBottom,
+  New: mdiNewspaperVariantOutline,
+  Ready: mdiProgressClock,
+  "Ready for Release": mdiCheckCircle,
+  Released: mdiCheckAll,
+  Resolved: mdiCheckboxMarked,
 };
 
 function WorkItems({
@@ -181,10 +213,10 @@ function WorkItems({
         width: 140,
         renderCell: (params: GridRenderCellParams): ReactElement => (
           <>
-            {typeIconMap[params.value] ? (
+            {typeMap[params.value] ? (
               <Icon
-                color={typeIconMap[params.value]?.color}
-                path={typeIconMap[params.value]?.icon}
+                color={typeMap[params.value]?.color}
+                path={typeMap[params.value]?.icon}
                 size={1}
                 style={{ marginRight: theme.spacing(0.25) }}
               />
@@ -205,9 +237,21 @@ function WorkItems({
         headerName: "State",
         width: 160,
         renderCell: (params: GridRenderCellParams): ReactElement => (
-          <span style={{ color: statesColorMap[params.value] }}>
-            {params.value}
-          </span>
+          <>
+            {stateIconMap[params.value] ? (
+              <Icon
+                color={statesColorMap[params.value]}
+                path={stateIconMap[params.value]}
+                size={1}
+                style={{ marginRight: theme.spacing(0.25) }}
+              />
+            ) : (
+              ""
+            )}
+            <span style={{ color: statesColorMap[params.value] }}>
+              {params.value}
+            </span>
+          </>
         ),
         sortComparator: (v1: string, v2: string): number =>
           states.find((state: State) => state.name === v1)?.order >
