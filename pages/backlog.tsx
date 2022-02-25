@@ -266,7 +266,6 @@ function Backlog(): ReactElement {
                 </Grid>
                 <WorkItems
                   backlog
-                  processWorkItemTypes={processWorkItemTypes}
                   selectionModel={selectionModel}
                   states={states}
                   workItemsView={workItemsView}

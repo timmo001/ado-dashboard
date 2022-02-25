@@ -57,7 +57,6 @@ export interface WorkItemsView {
 
 interface WorkItemsProps {
   backlog?: boolean;
-  processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
   selectionModel: GridSelectionModel;
   workItemsView: Array<WorkItemsView>;
   states: Array<State>;
@@ -87,7 +86,6 @@ const typeIconMap: TypeIconMap = {
 
 function WorkItems({
   backlog,
-  processWorkItemTypes,
   selectionModel,
   states,
   workItemsView,

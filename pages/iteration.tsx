@@ -329,7 +329,6 @@ function Iteration(): ReactElement {
                     padding: theme.spacing(1, 0),
                   }}>
                   <WorkItems
-                    processWorkItemTypes={processWorkItemTypes}
                     selectionModel={selectionModel}
                     states={states}
                     workItemsView={currentWorkItemsView}
