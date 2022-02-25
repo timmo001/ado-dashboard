@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import { Chip, CircularProgress, Grid, Link, useTheme } from "@mui/material";
-import { blue, red, indigo, orange, yellow } from "@mui/material/colors";
+import { blue, red, indigo, orange, yellow, cyan } from "@mui/material/colors";
 import {
   DataGrid,
   GridColDef,
@@ -20,9 +20,11 @@ import {
 } from "@mui/x-data-grid";
 import {
   mdiBook,
+  mdiBookOpenPageVariantOutline,
   mdiBookVariantMultiple,
   mdiBug,
   mdiClipboardList,
+  mdiFlask,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import ReactHtmlParser from "react-html-parser";
@@ -75,9 +77,11 @@ interface StateColorMap {
 
 const typeIconMap: TypeIconMap = {
   Bug: { color: red[400], icon: mdiBug },
+  "Enabler Story": { color: cyan[400], icon: mdiBookOpenPageVariantOutline },
   Epic: { color: orange[400], icon: mdiBookVariantMultiple },
   Feature: { color: indigo[400], icon: mdiBookVariantMultiple },
   Task: { color: yellow[400], icon: mdiClipboardList },
+  "Test Case": { color: indigo[400], icon: mdiFlask },
   "User Story": { color: blue[400], icon: mdiBook },
 };
 
