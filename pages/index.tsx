@@ -17,6 +17,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import Icon from "@mdi/react";
 
 import { AzureDevOps } from "lib/azureDevOps";
 import {
@@ -31,6 +32,7 @@ import {
   getChartAnalyticsWorkItemsCurrentIteration,
 } from "lib/chartData";
 import { groupByKey } from "lib/util";
+import { stateIconMap } from "components/WorkItems";
 import Layout from "components/Layout";
 import useStyles from "assets/jss/components/layout";
 
@@ -206,7 +208,19 @@ function Dashboard(): ReactElement {
                     padding: theme.spacing(1),
                     color: `#${state.color}`,
                   }}>
-                  <Typography variant="h4">{state.name}</Typography>
+                  <Typography variant="h4">
+                    {state.name}
+                    {stateIconMap[state.name] ? (
+                      <Icon
+                        color={`#${state.color}`}
+                        path={stateIconMap[state.name]}
+                        size={1}
+                        style={{ marginLeft: theme.spacing(1) }}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </Typography>
                   <Typography variant="h5">
                     {itemsByStateBacklog[state.name]?.length || 0}
                   </Typography>
@@ -221,7 +235,11 @@ function Dashboard(): ReactElement {
               <CircularProgress color="primary" />
             </Grid>
           )}
-          <Typography component="h4" gutterBottom variant="h5">
+          <Typography
+            component="h4"
+            gutterBottom
+            variant="h5"
+            sx={{ marginTop: theme.spacing(2) }}>
             Items by State
           </Typography>
           {chartAnalyticsWorkItems && states ? (
@@ -285,7 +303,19 @@ function Dashboard(): ReactElement {
                     padding: theme.spacing(1),
                     color: `#${state.color}`,
                   }}>
-                  <Typography variant="h4">{state.name}</Typography>
+                  <Typography variant="h4">
+                    {state.name}
+                    {stateIconMap[state.name] ? (
+                      <Icon
+                        color={`#${state.color}`}
+                        path={stateIconMap[state.name]}
+                        size={1}
+                        style={{ marginLeft: theme.spacing(1) }}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </Typography>
                   <Typography variant="h5">
                     {itemsByStateCurrentIteration[state.name]?.length || 0}
                   </Typography>
@@ -300,7 +330,11 @@ function Dashboard(): ReactElement {
               <CircularProgress color="primary" />
             </Grid>
           )}
-          <Typography component="h4" gutterBottom variant="h5">
+          <Typography
+            component="h4"
+            gutterBottom
+            variant="h5"
+            sx={{ marginTop: theme.spacing(2) }}>
             Items by State
           </Typography>
           {chartAnalyticsWorkItemsCurrentIteration && states ? (

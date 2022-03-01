@@ -36,6 +36,7 @@ import {
   mdiNewspaperVariantOutline,
   mdiProgressClock,
   mdiProgressPencil,
+  mdiSignCaution,
   mdiTestTube,
 } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -75,22 +76,22 @@ interface WorkItemsProps {
   setSelectionModel: Dispatch<SetStateAction<GridSelectionModel>>;
 }
 
-interface TypeMap {
+export interface TypeMap {
   [type: string]: {
     color: string;
     icon: string;
   };
 }
 
-interface StateIconMap {
+export interface StateIconMap {
   [state: string]: string;
 }
 
-interface StateColorMap {
+export interface StateColorMap {
   [state: string]: string;
 }
 
-const typeMap: TypeMap = {
+export const typeMap: TypeMap = {
   Bug: { color: red[400], icon: mdiBug },
   "Enabler Story": { color: cyan[400], icon: mdiBookOpenPageVariantOutline },
   Epic: { color: orange[400], icon: mdiBookVariantMultiple },
@@ -100,10 +101,11 @@ const typeMap: TypeMap = {
   "User Story": { color: blue[400], icon: mdiBook },
 };
 
-const stateIconMap: StateIconMap = {
+export const stateIconMap: StateIconMap = {
   Active: mdiProgressPencil,
   Closed: mdiBookLockOutline,
   Done: mdiCheckOutline,
+  "On Hold": mdiSignCaution,
   "In Code Review": mdiMessageDraw,
   "In Development": mdiProgressPencil,
   "In Review": mdiMessage,
