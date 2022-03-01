@@ -102,7 +102,7 @@ function Dashboard(): ReactElement {
         setAnalyticsWorkItems(result)
       );
     azureDevOps
-      .getWorkItemIds(areaPath, true, true)
+      .getWorkItemIds(areaPath, false, true, false)
       .then((ids: Array<number>) =>
         azureDevOps
           .getWorkItems(ids)
