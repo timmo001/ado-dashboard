@@ -16,6 +16,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
+import Icon from "@mdi/react";
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
@@ -30,7 +31,7 @@ import { Picker } from "lib/types/general";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
-import WorkItems, { WorkItemsView } from "components/WorkItems";
+import WorkItems, { stateIconMap, WorkItemsView } from "components/WorkItems";
 
 let azureDevOps: AzureDevOps;
 function Backlog(): ReactElement {
@@ -247,7 +248,17 @@ function Backlog(): ReactElement {
                             padding: theme.spacing(1),
                             color: `#${state.color}`,
                           }}>
-                          <Typography component="span" variant="body1">
+                          {stateIconMap[state.name] ? (
+                            <Icon
+                              color={`#${state.color}`}
+                              path={stateIconMap[state.name]}
+                              size={0.75}
+                              style={{ marginRight: theme.spacing(0.5) }}
+                            />
+                          ) : (
+                            ""
+                          )}
+                          <Typography component="span" variant="subtitle1">
                             {state.name}:{" "}
                             {itemsByState[state.name]?.length || 0}
                           </Typography>
