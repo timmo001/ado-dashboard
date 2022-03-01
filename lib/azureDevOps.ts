@@ -43,8 +43,8 @@ export class AzureDevOps {
     try {
       return await axios.get<T>(url, { auth: this.auth });
     } catch (e) {
-      console.error(e);
-      throw new Error(e);
+      console.error(e.message, e.response);
+      throw new Error(`${e.message} - ${e.response?.data?.error?.message}`);
     }
   }
 
@@ -57,8 +57,8 @@ export class AzureDevOps {
         },
       });
     } catch (e) {
-      console.error(e);
-      throw new Error(e);
+      console.error(e.message, e.response);
+      throw new Error(`${e.message} - ${e.response?.data?.error?.message}`);
     }
   }
 
@@ -71,8 +71,8 @@ export class AzureDevOps {
         },
       });
     } catch (e) {
-      console.error(e);
-      throw new Error(e);
+      console.error(e.message, e.response);
+      throw new Error(`${e.message} - ${e.response?.data?.error?.message}`);
     }
   }
 
@@ -88,7 +88,6 @@ export class AzureDevOps {
       &$expand=AssignedTo($select=UserName),Iteration($select=IterationPath),Area($select=AreaPath)`
     );
     if (response.status == 200) return response.data.value;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getAnalyticsWorkItemsCurrentIteration(): Promise<
@@ -109,7 +108,6 @@ export class AzureDevOps {
       )`
     );
     if (response.status == 200) return response.data.value;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getAnalyticsWorkItems(): Promise<Array<AnalyticsWorkItem>> {
@@ -138,7 +136,6 @@ export class AzureDevOps {
         ),
       }));
     }
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getIterations(): Promise<Array<Iteration>> {
@@ -160,7 +157,6 @@ export class AzureDevOps {
       });
       return data;
     }
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getProjects(): Promise<Array<Project>> {
@@ -168,7 +164,6 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/_apis/projects?api-version=6.0`
     );
     if (response.status == 200) return response.data.value;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getProject(): Promise<Project> {
@@ -176,7 +171,6 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/_apis/projects/${this.project}?api-version=6.0&includeCapabilities=true`
     );
     if (response.status == 200) return response.data;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   getChildPath(node: ClassificationNodeChild): Array<AreaPath> {
@@ -208,7 +202,6 @@ export class AzureDevOps {
       }
       return paths;
     }
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getProcesses(): Promise<Array<Process>> {
@@ -216,14 +209,12 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/_apis/process/processes?api-version=6.0`
     );
     if (response.status == 200) return response.data.value;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
   async getProcess(processId: string): Promise<Process> {
     const response = await this.get<Process>(
       `https://dev.azure.com/${this.organization}/_apis/process/processes/${processId}?api-version=6.0`
     );
     if (response.status == 200) return response.data;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getProcessTypes(
@@ -233,7 +224,6 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/_apis/work/processdefinitions/${processId}/workItemTypes?api-version=6.0`
     );
     if (response.status == 200) return response.data.value;
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getStates(
@@ -263,7 +253,6 @@ export class AzureDevOps {
       });
       return data.filter((state: State) => !state.hidden);
     }
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getStatesFromProject(): Promise<{
@@ -320,7 +309,6 @@ export class AzureDevOps {
       return response.data.workItemRelations.map(
         (wir: IterationWorkItemRelation) => wir.target.id
       );
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getWorkItemIds(
@@ -345,7 +333,6 @@ export class AzureDevOps {
       return response.data.workItems.map(
         (queryWorkItem: QueryWorkItem) => queryWorkItem.id
       );
-    throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 
   async getWorkItems(ids: Array<number>): Promise<Array<WorkItemExpanded>> {
@@ -383,7 +370,6 @@ export class AzureDevOps {
             };
           })
         );
-      else throw new Error(`Error: ${response.status} - ${response.data}`);
     }
     return data;
   }
@@ -398,8 +384,7 @@ export class AzureDevOps {
       `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/workItems/${id}?api-version=6.0&validateOnly=${validateOnly}`,
       workItemRevision
     );
-    if (response.status === 200) {
+    if (response.status === 200)
       console.log("Response: ", response.status, response.data);
-    } else throw new Error(`Error: ${response.status} - ${response.data}`);
   }
 }
