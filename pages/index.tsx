@@ -205,10 +205,10 @@ function Dashboard(): ReactElement {
                   item
                   xs={4}
                   sx={{
-                    padding: theme.spacing(1),
+                    margin: theme.spacing(1, 0),
                     color: `#${state.color}`,
                   }}>
-                  <Typography variant="h4">
+                  <Typography variant="h4" noWrap>
                     {state.name}
                     {stateIconMap[state.name] ? (
                       <Icon
@@ -221,7 +221,7 @@ function Dashboard(): ReactElement {
                       ""
                     )}
                   </Typography>
-                  <Typography variant="h5">
+                  <Typography variant="h5" noWrap>
                     {itemsByStateBacklog[state.name]?.length || 0}
                   </Typography>
                 </Grid>
@@ -300,10 +300,10 @@ function Dashboard(): ReactElement {
                   item
                   xs={4}
                   sx={{
-                    padding: theme.spacing(1),
+                    margin: theme.spacing(1, 0),
                     color: `#${state.color}`,
                   }}>
-                  <Typography variant="h4">
+                  <Typography variant="h4" noWrap>
                     {state.name}
                     {stateIconMap[state.name] ? (
                       <Icon
@@ -316,7 +316,7 @@ function Dashboard(): ReactElement {
                       ""
                     )}
                   </Typography>
-                  <Typography variant="h5">
+                  <Typography variant="h5" noWrap>
                     {itemsByStateCurrentIteration[state.name]?.length || 0}
                   </Typography>
                 </Grid>
