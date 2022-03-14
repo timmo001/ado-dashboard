@@ -7,6 +7,7 @@ import {
   GridToolbarExport,
   GridToolbarColumnsButton,
 } from "@mui/x-data-grid";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import { mdiUndoVariant } from "@mdi/js";
 

@@ -17,6 +17,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 
 import { AzureDevOps } from "lib/azureDevOps";

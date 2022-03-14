@@ -1,13 +1,7 @@
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import {
-  Alert,
-  CircularProgress,
-  Grid,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Alert, CircularProgress, Grid, Typography } from "@mui/material";
 import {
   AreaChart,
   Area,
@@ -89,22 +83,19 @@ function CycleLeadTime(): ReactElement {
   );
 
   const classes = useStyles();
-  const theme = useTheme();
 
   return (
     <Layout
       classes={classes}
       title="Cycle/Lead Time"
-      description="Azure DevOps Dashboard"
-    >
+      description="Azure DevOps Dashboard">
       <Grid
         className={classes.main}
         component="article"
         container
         direction="row"
         alignContent="space-around"
-        justifyContent="space-around"
-      >
+        justifyContent="space-around">
         {alert ? (
           <Grid item xs={11}>
             <Alert severity="error">{alert}</Alert>
@@ -122,8 +113,7 @@ function CycleLeadTime(): ReactElement {
                 style={{
                   width: "100%",
                   height: 760,
-                }}
-              >
+                }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartAnalyticsLeadCycleTime}>
                     <XAxis dataKey="Date" />
@@ -136,8 +126,7 @@ function CycleLeadTime(): ReactElement {
                         x1="0"
                         y1="0"
                         x2="0"
-                        y2="1"
-                      >
+                        y2="1">
                         <stop
                           offset="5%"
                           stopColor={`#${states[states.length - 4].color}`}
@@ -154,8 +143,7 @@ function CycleLeadTime(): ReactElement {
                         x1="0"
                         y1="0"
                         x2="0"
-                        y2="1"
-                      >
+                        y2="1">
                         <stop
                           offset="5%"
                           stopColor={`#${states[states.length - 2].color}`}
@@ -190,8 +178,7 @@ function CycleLeadTime(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around"
-            >
+              justifyContent="space-around">
               <CircularProgress color="primary" />
             </Grid>
           )}

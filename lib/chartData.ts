@@ -19,7 +19,7 @@ export function getChartAnalyticsWorkItemsCurrentIteration(
     "DateValue"
   );
   return Object.keys(dates).map((date: string) => {
-    let value = {
+    const value = {
       Date: moment(date).format("Do MMM YYYY"),
     };
     const itemsByStates = groupByKey<AnalyticsWorkItem>(dates[date], "State");
@@ -47,7 +47,7 @@ export function getChartAnalyticsWorkItems(
     "DateValue"
   );
   return Object.keys(dates).map((date: string) => {
-    let value = {
+    const value = {
       Date: moment(date).format("Do MMM YYYY"),
     };
     const itemsByStates = groupByKey<AnalyticsWorkItem>(dates[date], "State");
@@ -76,7 +76,7 @@ export function getChartAnalyticsWorkItemsAge(
     "DateValue"
   );
   return Object.keys(dates).map((date: string) => {
-    let value = {
+    const value = {
       Date: moment(date).format("Do MMM YYYY"),
     };
     const sum: number = dates[date].reduce(
@@ -122,7 +122,7 @@ export function getChartAnalyticsLeadCycleTime(
     );
     const avgLeadTime: number = sumLeadTime / dates[date].length || 0;
 
-    let value = {
+    const value = {
       Date: moment(date).format("Do MMM YYYY"),
       "Average Cycle Time": avgCycleTime,
       "Total Cycle Time": sumCycleTime,

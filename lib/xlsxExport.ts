@@ -4,8 +4,6 @@ import moment from "moment";
 import { WorkItemExpanded } from "./types/azureDevOps";
 
 export class XLSXExport {
-  constructor() {}
-
   generateReleaseChecklist(workItems: Array<WorkItemExpanded>): void {
     const items = workItems.map((wi: WorkItemExpanded) => ({
       ID: wi.id,

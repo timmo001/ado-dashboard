@@ -15,8 +15,6 @@ interface LayoutProps {
 }
 
 function Layout(props: LayoutProps): ReactElement {
-  const classes = props.classes;
-
   return (
     <>
       <Head>

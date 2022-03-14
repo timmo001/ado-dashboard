@@ -16,6 +16,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import moment from "moment";
 
@@ -38,8 +39,6 @@ function Backlog(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [iterations, setIterations] = useState<Array<Backlog>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
-  const [processWorkItemTypes, setProcessWorkItemTypes] =
-    useState<Array<ProcessWorkItemTypeExtended>>();
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -89,7 +88,6 @@ function Backlog(): ReactElement {
               (state: State) => state.stateCategory !== "Completed"
             )
           );
-          setProcessWorkItemTypes(result.processWorkItemTypes);
         }
       );
   }, [areaPath, organization, project, personalAccessToken]);

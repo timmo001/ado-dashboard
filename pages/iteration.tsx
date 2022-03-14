@@ -18,6 +18,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import moment from "moment";
 
@@ -42,8 +43,6 @@ function Iteration(): ReactElement {
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
-  const [processWorkItemTypes, setProcessWorkItemTypes] =
-    useState<Array<ProcessWorkItemTypeExtended>>();
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
   const [workItems, setWorkItems] = useState<Array<WorkItemExpanded>>();
@@ -99,7 +98,6 @@ function Iteration(): ReactElement {
           processWorkItemTypes: Array<ProcessWorkItemTypeExtended>;
         }) => {
           setStates(result.states);
-          setProcessWorkItemTypes(result.processWorkItemTypes);
         }
       );
   }, [organization, project, personalAccessToken, iteration]);
@@ -210,16 +208,14 @@ function Iteration(): ReactElement {
       <Layout
         classes={classes}
         title={currentIteration?.name || "Iteration"}
-        description="Azure DevOps Dashboard"
-      >
+        description="Azure DevOps Dashboard">
         <Grid
           className={classes.main}
           component="article"
           container
           direction="row"
           alignContent="space-around"
-          justifyContent="space-around"
-        >
+          justifyContent="space-around">
           {alert ? (
             <Grid item xs={11}>
               <Alert severity="error">{alert}</Alert>
@@ -232,16 +228,14 @@ function Iteration(): ReactElement {
               container
               direction="row"
               alignContent="space-between"
-              justifyContent="space-between"
-            >
+              justifyContent="space-between">
               <Grid item xs={8}>
                 <Typography
                   component="h3"
                   variant="h4"
                   sx={{
                     padding: theme.spacing(1.8, 0, 1, 0),
-                  }}
-                >
+                  }}>
                   {currentIteration?.name || "Iteration"}
                 </Typography>
               </Grid>
@@ -252,8 +246,7 @@ function Iteration(): ReactElement {
                     xs={4}
                     sx={{
                       padding: theme.spacing(1, 0),
-                    }}
-                  >
+                    }}>
                     <Autocomplete
                       disablePortal
                       disableClearable
@@ -289,8 +282,7 @@ function Iteration(): ReactElement {
                     padding: theme.spacing(1, 0),
                   }}
                   alignContent="space-around"
-                  justifyContent="flex-end"
-                >
+                  justifyContent="flex-end">
                   <Grid
                     item
                     xs
@@ -298,8 +290,7 @@ function Iteration(): ReactElement {
                     direction="row"
                     alignContent="space-around"
                     justifyContent="space-around"
-                    sx={{ padding: theme.spacing(0, 1) }}
-                  >
+                    sx={{ padding: theme.spacing(0, 1) }}>
                     {states.map((state: State) => (
                       <Grid
                         key={state.id}
@@ -307,8 +298,7 @@ function Iteration(): ReactElement {
                         sx={{
                           padding: theme.spacing(1),
                           color: `#${state.color}`,
-                        }}
-                      >
+                        }}>
                         {stateIconMap[state.name] ? (
                           <Icon
                             color={`#${state.color}`}
@@ -328,8 +318,7 @@ function Iteration(): ReactElement {
                   <Grid item sx={{ paddingLeft: theme.spacing(1) }}>
                     <Button
                       variant="outlined"
-                      onClick={handleGenerateChecklist}
-                    >
+                      onClick={handleGenerateChecklist}>
                       Generate Release Checklist..
                     </Button>
                   </Grid>
@@ -337,8 +326,7 @@ function Iteration(): ReactElement {
                     <Button
                       disabled={selectionModel.length > 0 ? false : true}
                       variant="outlined"
-                      onClick={handleMoveIteration}
-                    >
+                      onClick={handleMoveIteration}>
                       Move to Sprint..
                     </Button>
                   </Grid>
@@ -348,8 +336,7 @@ function Iteration(): ReactElement {
                   xs={12}
                   sx={{
                     padding: theme.spacing(1, 0),
-                  }}
-                >
+                  }}>
                   <WorkItems
                     selectionModel={selectionModel}
                     states={states}
@@ -362,8 +349,7 @@ function Iteration(): ReactElement {
               <Grid
                 container
                 alignContent="space-around"
-                justifyContent="space-around"
-              >
+                justifyContent="space-around">
                 <CircularProgress color="primary" />
               </Grid>
             )}

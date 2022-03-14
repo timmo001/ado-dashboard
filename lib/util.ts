@@ -16,13 +16,10 @@ export function arrayOfDatesBetweenDates(
   startDate: string,
   endDate: string
 ): Array<Moment> {
-  var dates = [];
-
-  var currDate = moment(startDate).startOf("day");
-  var lastDate = moment(endDate).startOf("day");
-
+  const dates = [];
+  const currDate = moment(startDate).startOf("day");
+  const lastDate = moment(endDate).startOf("day");
   while (currDate.add(1, "days").diff(lastDate) < 0)
     dates.push(currDate.clone());
-
   return dates;
 }

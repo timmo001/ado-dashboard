@@ -11,6 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { mdiMenu } from "@mdi/js";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import clsx from "clsx";
 

@@ -39,6 +39,7 @@ import {
   mdiSignCaution,
   mdiTestTube,
 } from "@mdi/js";
+// eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import ReactHtmlParser from "react-html-parser";
 
@@ -174,7 +175,7 @@ function WorkItems({
 
   const statesColorMap = useMemo<StateColorMap>(() => {
     if (!states) return undefined;
-    let s = {};
+    const s = {};
     states.forEach((state: State) => {
       s[state.name] = `#${state.color}`;
     });
@@ -351,8 +352,7 @@ function WorkItems({
           xs={12}
           sx={{
             padding: theme.spacing(1, 0),
-          }}
-        >
+          }}>
           <DataGrid
             autoHeight
             checkboxSelection
@@ -418,8 +418,7 @@ function WorkItems({
         <Grid
           container
           alignContent="space-around"
-          justifyContent="space-around"
-        >
+          justifyContent="space-around">
           <CircularProgress color="primary" />
         </Grid>
       )}

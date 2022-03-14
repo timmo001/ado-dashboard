@@ -39,7 +39,7 @@ export class AzureDevOps {
     this.project = project;
   }
 
-  async get<T>(url: string): Promise<AxiosResponse<T, any>> {
+  async get<T>(url: string): Promise<AxiosResponse<T, unknown>> {
     try {
       return await axios.get<T>(url, { auth: this.auth });
     } catch (e) {
@@ -48,7 +48,10 @@ export class AzureDevOps {
     }
   }
 
-  async patch<T>(url: string, data: unknown): Promise<AxiosResponse<T, any>> {
+  async patch<T>(
+    url: string,
+    data: unknown
+  ): Promise<AxiosResponse<T, unknown>> {
     try {
       return await axios.patch<T>(url, data, {
         auth: this.auth,
@@ -62,7 +65,10 @@ export class AzureDevOps {
     }
   }
 
-  async post<T>(url: string, data: unknown): Promise<AxiosResponse<T, any>> {
+  async post<T>(
+    url: string,
+    data: unknown
+  ): Promise<AxiosResponse<T, unknown>> {
     try {
       return await axios.post<T>(url, data, {
         auth: this.auth,
@@ -264,8 +270,8 @@ export class AzureDevOps {
       proj.capabilities.processTemplate.templateTypeId
     );
 
-    let s: Array<State> = [];
-    let pwts: Array<ProcessWorkItemTypeExtended> = [];
+    const s: Array<State> = [];
+    const pwts: Array<ProcessWorkItemTypeExtended> = [];
     for (const processWorkItemType of await this.getProcessTypes(process.id)) {
       for (const state of await this.getStates(
         process.id,
@@ -313,9 +319,9 @@ export class AzureDevOps {
 
   async getWorkItemIds(
     areaPath: string = this.project,
-    removeClosed: boolean = false,
-    removeRemoved: boolean = false,
-    removeDone: boolean = false
+    removeClosed = false,
+    removeRemoved = false,
+    removeDone = false
   ): Promise<Array<number>> {
     const response = await this.post<Query>(
       `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=6.0`,
@@ -339,9 +345,9 @@ export class AzureDevOps {
     const data: Array<WorkItemExpanded> = [];
     let i: number,
       j: number,
-      idsChunked: any,
-      chunk = 200,
+      idsChunked: Array<unknown>,
       order = 0;
+    const chunk = 200;
     for (i = 0, j = ids.length; i < j; i += chunk) {
       idsChunked = ids.slice(i, i + chunk);
       const response = await this.get<ODataResponse<WorkItem>>(
@@ -377,7 +383,7 @@ export class AzureDevOps {
   async updateWorkItem(
     id: number,
     workItemRevision: Array<WorkItemRevision>,
-    validateOnly: boolean = false
+    validateOnly = false
   ): Promise<void> {
     console.log("updateWorkItem:", id, workItemRevision);
     const response = await this.patch<WorkItem>(
