@@ -116,7 +116,7 @@ export class XLSXExport {
 
     worksheet
       .addTable({
-        name: "Release Checklist",
+        name: "Release_Checklist",
         ref: "A1",
         headerRow: true,
         style: {
