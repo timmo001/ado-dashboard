@@ -351,7 +351,8 @@ function WorkItems({
           xs={12}
           sx={{
             padding: theme.spacing(1, 0),
-          }}>
+          }}
+        >
           <DataGrid
             autoHeight
             checkboxSelection
@@ -417,7 +418,8 @@ function WorkItems({
         <Grid
           container
           alignContent="space-around"
-          justifyContent="space-around">
+          justifyContent="space-around"
+        >
           <CircularProgress color="primary" />
         </Grid>
       )}

@@ -92,7 +92,8 @@ function Age(): ReactElement {
         container
         direction="row"
         alignContent="space-around"
-        justifyContent="space-around">
+        justifyContent="space-around"
+      >
         {alert ? (
           <Grid item xs={11}>
             <Alert severity="error">{alert}</Alert>
@@ -110,7 +111,8 @@ function Age(): ReactElement {
                 style={{
                   width: "100%",
                   height: 760,
-                }}>
+                }}
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartAnalyticsWorkItemsAge}>
                     <XAxis dataKey="Date" />
@@ -140,7 +142,8 @@ function Age(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               <CircularProgress color="primary" />
             </Grid>
           )}

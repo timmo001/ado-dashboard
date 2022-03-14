@@ -168,14 +168,16 @@ function Dashboard(): ReactElement {
     <Layout
       classes={classes}
       title="Dashboard"
-      description="Azure DevOps Dashboard">
+      description="Azure DevOps Dashboard"
+    >
       <Grid
         className={classes.main}
         component="article"
         container
         direction="row"
         alignContent="space-around"
-        justifyContent="center">
+        justifyContent="center"
+      >
         {alert ? (
           <Grid item xs={11}>
             <Alert severity="error">{alert}</Alert>
@@ -189,7 +191,8 @@ function Dashboard(): ReactElement {
           sx={{
             padding: theme.spacing(1, 2, 1, 4),
             borderRight: "1px dashed #cccccc",
-          }}>
+          }}
+        >
           <Typography component="h3" gutterBottom variant="h4">
             Backlog
           </Typography>
@@ -198,7 +201,8 @@ function Dashboard(): ReactElement {
               container
               direction="row"
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               {states.map((state: State) => (
                 <Grid
                   key={state.id}
@@ -207,7 +211,8 @@ function Dashboard(): ReactElement {
                   sx={{
                     margin: theme.spacing(1, 0),
                     color: `#${state.color}`,
-                  }}>
+                  }}
+                >
                   <Typography variant="h4" noWrap>
                     {state.name}
                     {stateIconMap[state.name] ? (
@@ -231,7 +236,8 @@ function Dashboard(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               <CircularProgress color="primary" />
             </Grid>
           )}
@@ -239,7 +245,8 @@ function Dashboard(): ReactElement {
             component="h4"
             gutterBottom
             variant="h5"
-            sx={{ marginTop: theme.spacing(2) }}>
+            sx={{ marginTop: theme.spacing(2) }}
+          >
             Items by State
           </Typography>
           {chartAnalyticsWorkItems && states ? (
@@ -248,7 +255,8 @@ function Dashboard(): ReactElement {
                 style={{
                   width: "100%",
                   height: 520,
-                }}>
+                }}
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartAnalyticsWorkItems}>
                     <XAxis dataKey="Date" />
@@ -273,7 +281,8 @@ function Dashboard(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               <CircularProgress color="primary" />
             </Grid>
           )}
@@ -284,7 +293,8 @@ function Dashboard(): ReactElement {
           sx={{
             padding: theme.spacing(1, 4, 1, 2),
             borderLeft: "1px dashed #cccccc",
-          }}>
+          }}
+        >
           <Typography component="h3" gutterBottom variant="h4">
             Current Sprint
           </Typography>
@@ -293,7 +303,8 @@ function Dashboard(): ReactElement {
               container
               direction="row"
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               {states.map((state: State) => (
                 <Grid
                   key={state.id}
@@ -302,7 +313,8 @@ function Dashboard(): ReactElement {
                   sx={{
                     margin: theme.spacing(1, 0),
                     color: `#${state.color}`,
-                  }}>
+                  }}
+                >
                   <Typography variant="h4" noWrap>
                     {state.name}
                     {stateIconMap[state.name] ? (
@@ -326,7 +338,8 @@ function Dashboard(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               <CircularProgress color="primary" />
             </Grid>
           )}
@@ -334,7 +347,8 @@ function Dashboard(): ReactElement {
             component="h4"
             gutterBottom
             variant="h5"
-            sx={{ marginTop: theme.spacing(2) }}>
+            sx={{ marginTop: theme.spacing(2) }}
+          >
             Items by State
           </Typography>
           {chartAnalyticsWorkItemsCurrentIteration && states ? (
@@ -343,7 +357,8 @@ function Dashboard(): ReactElement {
                 style={{
                   width: "100%",
                   height: 520,
-                }}>
+                }}
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartAnalyticsWorkItemsCurrentIteration}>
                     <XAxis dataKey="Date" />
@@ -366,7 +381,8 @@ function Dashboard(): ReactElement {
             <Grid
               container
               alignContent="space-around"
-              justifyContent="space-around">
+              justifyContent="space-around"
+            >
               <CircularProgress color="primary" />
             </Grid>
           )}

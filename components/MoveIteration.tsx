@@ -39,7 +39,8 @@ function MoveIteration({
       maxWidth="sm"
       scroll="body"
       open={newIteration ? true : false}
-      onClose={handleCloseMoveIteration}>
+      onClose={handleCloseMoveIteration}
+    >
       <DialogTitle>Move iteration</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -68,7 +69,8 @@ function MoveIteration({
         <Button
           onClick={() => {
             handleMoveIterationConfirm(newIteration);
-          }}>
+          }}
+        >
           Move
         </Button>
       </DialogActions>

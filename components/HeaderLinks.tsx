@@ -24,7 +24,8 @@ function HeaderLinks(): ReactElement {
           <Button
             variant="outlined"
             className={classes.navLink}
-            onClick={handleSetProject}>
+            onClick={handleSetProject}
+          >
             <span className={classes.listItemText}>Set Project</span>
           </Button>
         </ListItem>
@@ -34,7 +35,8 @@ function HeaderLinks(): ReactElement {
             href={{
               pathname: "/",
               query: router.query,
-            }}>
+            }}
+          >
             <Button variant="text" className={classes.navLink}>
               <span className={classes.listItemText}>Dashboard</span>
             </Button>
@@ -45,7 +47,8 @@ function HeaderLinks(): ReactElement {
             href={{
               pathname: "/age",
               query: router.query,
-            }}>
+            }}
+          >
             <Button variant="text" className={classes.navLink}>
               <span className={classes.listItemText}>Age</span>
             </Button>
@@ -56,7 +59,8 @@ function HeaderLinks(): ReactElement {
             href={{
               pathname: "/cycle-lead-time",
               query: router.query,
-            }}>
+            }}
+          >
             <Button variant="text" className={classes.navLink}>
               <span className={classes.listItemText}>Cycle/Lead Time</span>
             </Button>
@@ -67,7 +71,8 @@ function HeaderLinks(): ReactElement {
             href={{
               pathname: "/backlog",
               query: router.query,
-            }}>
+            }}
+          >
             <Button variant="text" className={classes.navLink}>
               <span className={classes.listItemText}>Backlog</span>
             </Button>
@@ -78,7 +83,8 @@ function HeaderLinks(): ReactElement {
             href={{
               pathname: "/iteration",
               query: router.query,
-            }}>
+            }}
+          >
             <Button variant="text" className={classes.navLink}>
               <span className={classes.listItemText}>Sprints</span>
             </Button>
