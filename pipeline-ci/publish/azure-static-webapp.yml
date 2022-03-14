@@ -14,5 +14,6 @@ jobs:
         displayName: "Publish Azure Static WebApp"
         inputs:
           app_location: "/"
+          app_build_command: "yarn export"
           output_location: "out"
           azure_static_web_apps_api_token: $(deployment_token)
