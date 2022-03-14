@@ -14,8 +14,8 @@ jobs:
           yarn install
         displayName: "Yarn: install"
       - script: |
-          yarn build
-        displayName: "Yarn: build"
+          yarn export
+        displayName: "Yarn: export"
       - task: ArchiveFiles@2
         displayName: "Archive"
         inputs:

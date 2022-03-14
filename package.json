@@ -4,10 +4,11 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "next build && next export",
-    "eslint": "eslint --ext .ts --ext .tsx --color ./",
+    "build": "next build",
+    "export": "yarn build && next export",
+    "start": "next start",
     "start:dev": "next dev",
-    "start": "next start"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "11.8.2",
