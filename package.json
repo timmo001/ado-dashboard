@@ -22,14 +22,15 @@
     "@mui/x-data-grid": "5.6.1",
     "axios": "0.26.1",
     "clsx": "1.1.1",
+    "exceljs": "4.3.0",
+    "file-saver": "2.0.5",
     "moment": "2.29.1",
     "next": "12.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-html-parser": "2.0.2",
     "react-moment": "1.1.1",
-    "recharts": "2.1.9",
-    "xlsx": "0.18.3"
+    "recharts": "2.1.9"
   },
   "devDependencies": {
     "@types/node": "17.0.21",
