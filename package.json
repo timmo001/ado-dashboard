@@ -36,6 +36,8 @@
     "@types/react-html-parser": "2.0.2",
     "@typescript-eslint/eslint-plugin": "5.14.0",
     "@typescript-eslint/parser": "5.14.0",
+    "eslint": "8.11.0",
+    "eslint-config-next": "12.1.0",
     "prettier": "2.5.1",
     "typescript": "4.6.2"
   }
