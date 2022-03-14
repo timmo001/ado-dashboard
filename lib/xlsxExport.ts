@@ -106,7 +106,7 @@ export class XLSXExport {
         wi["Custom.Scripts"],
         wi["Custom.Fields"],
         wi["Custom.Misc"],
-        wi["Custom.ReleaseDetails"]?.replace(/<[^>]*>?/gm, ""),
+        wi["Custom.ReleaseDetails"],
         "",
         "",
         "",
