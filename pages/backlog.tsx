@@ -215,14 +215,16 @@ function Backlog(): ReactElement {
       <Layout
         classes={classes}
         title="Backlog"
-        description="Azure DevOps Dashboard">
+        description="Azure DevOps Dashboard"
+      >
         <Grid
           className={classes.main}
           component="article"
           container
           direction="row"
           alignContent="space-around"
-          justifyContent="space-around">
+          justifyContent="space-around"
+        >
           {alert ? (
             <Grid item xs={11}>
               <Alert severity="error">{alert}</Alert>
@@ -237,7 +239,8 @@ function Backlog(): ReactElement {
                   container
                   direction="row"
                   alignContent="space-between"
-                  justifyContent="space-between">
+                  justifyContent="space-between"
+                >
                   <Grid item xs={8}>
                     <Typography component="h3" variant="h4">
                       Backlog
@@ -251,14 +254,16 @@ function Backlog(): ReactElement {
                       padding: theme.spacing(1, 0),
                     }}
                     alignContent="space-around"
-                    justifyContent="flex-end">
+                    justifyContent="flex-end"
+                  >
                     <Grid
                       item
                       xs
                       container
                       direction="row"
                       alignContent="space-around"
-                      justifyContent="space-around">
+                      justifyContent="space-around"
+                    >
                       {states.map((state: State) => (
                         <Grid
                           key={state.id}
@@ -266,7 +271,8 @@ function Backlog(): ReactElement {
                           sx={{
                             padding: theme.spacing(1),
                             color: `#${state.color}`,
-                          }}>
+                          }}
+                        >
                           {stateIconMap[state.name] ? (
                             <Icon
                               color={`#${state.color}`}
@@ -288,7 +294,8 @@ function Backlog(): ReactElement {
                       <Button
                         disabled={selectionModel.length > 0 ? false : true}
                         variant="outlined"
-                        onClick={handleMoveIteration}>
+                        onClick={handleMoveIteration}
+                      >
                         Move to Sprint..
                       </Button>
                     </Grid>
@@ -307,7 +314,8 @@ function Backlog(): ReactElement {
               <Grid
                 container
                 alignContent="space-around"
-                justifyContent="space-around">
+                justifyContent="space-around"
+              >
                 <CircularProgress color="primary" />
               </Grid>
             )}
