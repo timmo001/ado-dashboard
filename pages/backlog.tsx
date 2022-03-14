@@ -16,13 +16,15 @@ import {
   useTheme,
 } from "@mui/material";
 import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
+import { camelCase } from "lodash";
 // eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import moment from "moment";
 
 import { AzureDevOps } from "lib/azureDevOps";
 import {
-  Iteration as Backlog,
+  Field,
+  Iteration,
   ProcessWorkItemTypeExtended,
   State,
   WorkItemExpanded,
@@ -32,12 +34,17 @@ import { Picker } from "lib/types/general";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
-import WorkItems, { stateIconMap, WorkItemsView } from "components/WorkItems";
+import WorkItems, {
+  CustomFieldMap,
+  stateIconMap,
+  WorkItemsView,
+} from "components/WorkItems";
 
 let azureDevOps: AzureDevOps;
 function Backlog(): ReactElement {
   const [alert, setAlert] = useState<string>();
-  const [iterations, setIterations] = useState<Array<Backlog>>();
+  const [fields, setFields] = useState<Array<Field>>();
+  const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [states, setStates] = useState<Array<State>>();
@@ -65,7 +72,8 @@ function Backlog(): ReactElement {
     setAlert(undefined);
     console.log("Get data:", { organization, project, areaPath });
     azureDevOps = new AzureDevOps(personalAccessToken, organization, project);
-    azureDevOps.getIterations().then((result: Array<Backlog>) => {
+    azureDevOps.getFields().then((result: Array<Field>) => setFields(result));
+    azureDevOps.getIterations().then((result: Array<Iteration>) => {
       setIterations(result);
     });
     azureDevOps
@@ -96,19 +104,34 @@ function Backlog(): ReactElement {
     setup();
   }, [areaPath, organization, project, personalAccessToken]);
 
-  const currentIteration = useMemo<Backlog>(() => {
+  const customFieldMap = useMemo<CustomFieldMap>(() => {
+    if (!fields) return undefined;
+    const fieldMap = {};
+    for (const field of fields)
+      if (
+        field.referenceName.startsWith("Custom.") &&
+        !Object.keys(fieldMap).includes(field.referenceName)
+      )
+        fieldMap[field.referenceName] = {
+          key: camelCase(field.referenceName.replace("Custom.", "")),
+          title: field.name,
+        };
+    return fieldMap;
+  }, [fields]);
+
+  const currentIteration = useMemo<Iteration>(() => {
     if (!iterations) return undefined;
     return iterations.find(
-      (iteration: Backlog) => iteration.attributes.timeFrame === "current"
+      (iteration: Iteration) => iteration.attributes.timeFrame === "current"
     );
   }, [iterations]);
 
   const iterationsPicker = useMemo<Array<Picker>>(() => {
     if (!iterations) return undefined;
     const ci = iterations.find(
-      (i: Backlog) => i.attributes.timeFrame === "current"
+      (i: Iteration) => i.attributes.timeFrame === "current"
     );
-    return iterations.map((i: Backlog) => ({
+    return iterations.map((i: Iteration) => ({
       id: i.id,
       label: `${i.id === ci?.id ? `(Current) ` : ""}${i.name}${
         i.attributes.startDate
@@ -126,29 +149,27 @@ function Backlog(): ReactElement {
   }, [currentIteration, iterationsPicker]);
 
   const workItemsView = useMemo<Array<WorkItemsView>>(() => {
-    if (!workItems) return undefined;
-    return workItems.map((wi: WorkItemExpanded) => ({
-      id: wi.id,
-      order: wi["Microsoft.VSTS.Common.StackRank"],
-      type: wi["System.WorkItemType"],
-      title: wi["System.Title"],
-      url: `https://dev.azure.com/${organization}/${project}/_workitems/edit/${wi.id}`,
-      iteration: wi.iteration,
-      state: wi["System.State"],
-      assignedTo: wi["System.AssignedTo"]?.displayName,
-      storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
-      tags: wi["System.Tags"],
-      areaPath: wi["System.AreaPath"],
-      components: wi["Custom.Components"],
-      functions: wi["Custom.Functions"],
-      exportList: wi["Custom.ExportList"],
-      tables: wi["Custom.Tables"],
-      fields: wi["Custom.Fields"],
-      scripts: wi["Custom.Scripts"],
-      files: wi["Custom.Fields"],
-      misc: wi["Custom.Misc"],
-      releaseDetails: wi["Custom.ReleaseDetails"],
-    }));
+    if (!workItems || !customFieldMap) return undefined;
+    return workItems.map((wi: WorkItemExpanded) => {
+      const item = {
+        id: wi.id,
+        order: wi["Microsoft.VSTS.Common.StackRank"],
+        type: wi["System.WorkItemType"],
+        title: wi["System.Title"],
+        url: `https://dev.azure.com/${organization}/${project}/_workitems/edit/${wi.id}`,
+        iteration: wi.iteration,
+        state: wi["System.State"],
+        assignedTo: wi["System.AssignedTo"]?.displayName,
+        storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
+        tags: wi["System.Tags"],
+        areaPath: wi["System.AreaPath"],
+        blocked: wi["Microsoft.VSTS.CMMI.Blocked"],
+      };
+      for (const key of Object.keys(wi))
+        if (Object.keys(customFieldMap).includes(key))
+          item[customFieldMap[key].key] = wi[key];
+      return item;
+    });
   }, [workItems]);
 
   const itemsByState = useMemo<{
@@ -168,7 +189,7 @@ function Backlog(): ReactElement {
   }
 
   function handleMoveIterationConfirm(newIteration: Picker): void {
-    const it = iterations.find((it: Backlog) => it.id === newIteration.id);
+    const it = iterations.find((it: Iteration) => it.id === newIteration.id);
     if (!it) {
       console.error("Could not find iteration");
       return;
@@ -194,16 +215,14 @@ function Backlog(): ReactElement {
       <Layout
         classes={classes}
         title="Backlog"
-        description="Azure DevOps Dashboard"
-      >
+        description="Azure DevOps Dashboard">
         <Grid
           className={classes.main}
           component="article"
           container
           direction="row"
           alignContent="space-around"
-          justifyContent="space-around"
-        >
+          justifyContent="space-around">
           {alert ? (
             <Grid item xs={11}>
               <Alert severity="error">{alert}</Alert>
@@ -218,8 +237,7 @@ function Backlog(): ReactElement {
                   container
                   direction="row"
                   alignContent="space-between"
-                  justifyContent="space-between"
-                >
+                  justifyContent="space-between">
                   <Grid item xs={8}>
                     <Typography component="h3" variant="h4">
                       Backlog
@@ -233,16 +251,14 @@ function Backlog(): ReactElement {
                       padding: theme.spacing(1, 0),
                     }}
                     alignContent="space-around"
-                    justifyContent="flex-end"
-                  >
+                    justifyContent="flex-end">
                     <Grid
                       item
                       xs
                       container
                       direction="row"
                       alignContent="space-around"
-                      justifyContent="space-around"
-                    >
+                      justifyContent="space-around">
                       {states.map((state: State) => (
                         <Grid
                           key={state.id}
@@ -250,8 +266,7 @@ function Backlog(): ReactElement {
                           sx={{
                             padding: theme.spacing(1),
                             color: `#${state.color}`,
-                          }}
-                        >
+                          }}>
                           {stateIconMap[state.name] ? (
                             <Icon
                               color={`#${state.color}`}
@@ -273,8 +288,7 @@ function Backlog(): ReactElement {
                       <Button
                         disabled={selectionModel.length > 0 ? false : true}
                         variant="outlined"
-                        onClick={handleMoveIteration}
-                      >
+                        onClick={handleMoveIteration}>
                         Move to Sprint..
                       </Button>
                     </Grid>
@@ -282,6 +296,7 @@ function Backlog(): ReactElement {
                 </Grid>
                 <WorkItems
                   backlog
+                  customFieldMap={customFieldMap}
                   selectionModel={selectionModel}
                   states={states}
                   workItemsView={workItemsView}
@@ -292,8 +307,7 @@ function Backlog(): ReactElement {
               <Grid
                 container
                 alignContent="space-around"
-                justifyContent="space-around"
-              >
+                justifyContent="space-around">
                 <CircularProgress color="primary" />
               </Grid>
             )}

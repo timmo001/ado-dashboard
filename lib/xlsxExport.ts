@@ -2,10 +2,18 @@ import { saveAs } from "file-saver";
 import { Workbook } from "exceljs";
 import moment from "moment";
 
-import { WorkItemExpanded } from "./types/azureDevOps";
+import { CustomFieldMap } from "components/WorkItems";
+import { WorkItemExpanded } from "lib/types/azureDevOps";
 
 export class XLSXExport {
-  generateReleaseChecklist(workItems: Array<WorkItemExpanded>): void {
+  generateReleaseChecklist(
+    workItems: Array<WorkItemExpanded>,
+    customFieldMap: CustomFieldMap
+  ): void {
+    // Remove any custom "blocked" fields
+    for (const key of Object.keys(customFieldMap))
+      if (key.toLowerCase().includes("block")) delete customFieldMap[key];
+
     const workbook = new Workbook();
 
     workbook.title = `Release Checklist - ${
@@ -31,44 +39,10 @@ export class XLSXExport {
         key: "Status",
         width: 20,
       },
-      {
-        key: "Components",
-        width: 24,
-      },
-      {
-        key: "Functions",
-        width: 24,
-      },
-      {
-        key: "Export List",
-        width: 24,
-      },
-      {
-        key: "Tables",
-        width: 24,
-      },
-      {
-        key: "Fields",
-        width: 24,
-      },
-      {
-        key: "Scripts",
-        width: 24,
-      },
-      {
-        key: "Files",
-        width: 24,
-      },
-      {
-        key: "Misc",
-        width: 40,
-        alignment: { wrapText: true },
-      },
-      {
-        key: "Release Details",
+      ...Object.values(customFieldMap).map((item) => ({
+        key: item.title,
         width: 60,
-        alignment: { wrapText: true },
-      },
+      })),
       {
         key: "Backed up",
         width: 18,
@@ -98,15 +72,11 @@ export class XLSXExport {
         wi["System.Title"],
         wi["System.Tags"],
         wi["System.State"],
-        wi["Custom.Components"],
-        wi["Custom.Functions"],
-        wi["Custom.ExportList"],
-        wi["Custom.Tables"],
-        wi["Custom.Fields"],
-        wi["Custom.Scripts"],
-        wi["Custom.Fields"],
-        wi["Custom.Misc"],
-        wi["Custom.ReleaseDetails"],
+        ...Object.keys(customFieldMap).map((key: string) =>
+          typeof wi[key] === "string"
+            ? String(wi[key]).replace(/<[^>]*>?/gm, "")
+            : wi[key]
+        ),
         "",
         "",
         "",
@@ -128,15 +98,10 @@ export class XLSXExport {
           { name: "Title", filterButton: true },
           { name: "Tags", filterButton: true },
           { name: "Status", filterButton: true },
-          { name: "Components", filterButton: true },
-          { name: "Functions", filterButton: true },
-          { name: "Export List", filterButton: true },
-          { name: "Tables", filterButton: true },
-          { name: "Fields", filterButton: true },
-          { name: "Scripts", filterButton: true },
-          { name: "Files", filterButton: true },
-          { name: "Misc", filterButton: true },
-          { name: "Release Details", filterButton: false },
+          ...Object.values(customFieldMap).map((value) => ({
+            name: value.title,
+            filterButton: true,
+          })),
           { name: "Backed up", filterButton: true },
           { name: "Deployed to Pre-Production", filterButton: true },
           { name: "Deployed to Production", filterButton: true },

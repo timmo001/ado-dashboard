@@ -41,10 +41,16 @@ import {
 } from "@mdi/js";
 // eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
-import ReactHtmlParser from "react-html-parser";
 
 import { State } from "lib/types/azureDevOps";
 import DataGridToolbar from "components/DataGridToolbar";
+
+export interface CustomFieldMap {
+  [field: string]: {
+    key: string;
+    title: string;
+  };
+}
 
 export interface WorkItemsView {
   id: number;
@@ -58,22 +64,16 @@ export interface WorkItemsView {
   storyPoints: number;
   tags: string;
   areaPath: string;
-  components: string;
-  functions: string;
-  exportList: string;
-  tables: string;
-  fields: string;
-  scripts: string;
-  files: string;
-  misc: string;
-  releaseDetails: string;
+  blocked: string;
+  [custom: string]: boolean | number | string;
 }
 
 interface WorkItemsProps {
   backlog?: boolean;
+  customFieldMap: CustomFieldMap;
   selectionModel: GridSelectionModel;
-  workItemsView: Array<WorkItemsView>;
   states: Array<State>;
+  workItemsView: Array<WorkItemsView>;
   setSelectionModel: Dispatch<SetStateAction<GridSelectionModel>>;
 }
 
@@ -121,6 +121,7 @@ export const stateIconMap: StateIconMap = {
 
 function WorkItems({
   backlog,
+  customFieldMap,
   selectionModel,
   states,
   workItemsView,
@@ -132,23 +133,18 @@ function WorkItems({
   const { columnsVisible, filter, sort } = router.query as NodeJS.Dict<string>;
 
   const initialState = useMemo<GridInitialState>(() => {
+    const defaultVisibleColumns = {
+      url: false,
+      iteration: backlog ? true : false,
+      areaPath: false,
+    };
+    for (const field of Object.values(customFieldMap))
+      defaultVisibleColumns[field.key] = false;
+
     const columnVisibilityModel: GridColumnVisibilityModel =
       columnsVisible && columnsVisible !== ""
         ? JSON.parse(columnsVisible)
-        : {
-            url: false,
-            iteration: backlog ? true : false,
-            areaPath: false,
-            components: false,
-            functions: false,
-            exportList: false,
-            tables: false,
-            fields: false,
-            scripts: false,
-            files: false,
-            misc: false,
-            releaseDetails: false,
-          };
+        : defaultVisibleColumns;
     const filterModel: GridFilterModel =
       filter && filter !== "" ? JSON.parse(filter) : undefined;
     const sortModel: GridSortModel =
@@ -184,7 +180,7 @@ function WorkItems({
 
   const columns = useMemo<Array<GridColDef>>(() => {
     if (!states || !statesColorMap) return undefined;
-    return [
+    const cols = [
       {
         field: "id",
         headerName: "ID",
@@ -292,54 +288,19 @@ function WorkItems({
         width: 320,
       },
       {
-        field: "components",
-        headerName: "Components",
-        width: 320,
-      },
-      {
-        field: "functions",
-        headerName: "Functions",
-        width: 320,
-      },
-      {
-        field: "exportList",
-        headerName: "Export List",
-        width: 240,
-      },
-      {
-        field: "tables",
-        headerName: "Tables",
-        width: 320,
-      },
-      {
-        field: "fields",
-        headerName: "Fields",
-        width: 320,
-      },
-      {
-        field: "scripts",
-        headerName: "Scripts",
-        width: 320,
-      },
-      {
-        field: "files",
-        headerName: "Files",
-        width: 320,
-      },
-      {
-        field: "misc",
-        headerName: "Misc",
-        width: 320,
-      },
-      {
-        field: "releaseDetails",
-        headerName: "Release Details",
-        width: 400,
-        renderCell: (params: GridRenderCellParams): ReactElement => (
-          <span>{ReactHtmlParser(params.value)}</span>
-        ),
+        field: "blocked",
+        headerName: "Blocked",
+        width: 100,
       },
     ];
+    for (const field of Object.values(customFieldMap))
+      cols.push({
+        field: field.key,
+        headerName: field.title,
+        width: 400,
+      });
+
+    return cols;
   }, [backlog, states]);
 
   const theme = useTheme();
@@ -352,8 +313,7 @@ function WorkItems({
           xs={12}
           sx={{
             padding: theme.spacing(1, 0),
-          }}
-        >
+          }}>
           <DataGrid
             autoHeight
             checkboxSelection
@@ -419,8 +379,7 @@ function WorkItems({
         <Grid
           container
           alignContent="space-around"
-          justifyContent="space-around"
-        >
+          justifyContent="space-around">
           <CircularProgress color="primary" />
         </Grid>
       )}

@@ -22,6 +22,7 @@ import {
   AreaPath,
   StructureType,
   ClassificationNodeChild,
+  Field,
 } from "./types/azureDevOps";
 
 export class AzureDevOps {
@@ -208,6 +209,13 @@ export class AzureDevOps {
       }
       return paths;
     }
+  }
+
+  async getFields(): Promise<Array<Field>> {
+    const response = await this.get<ODataResponse<Field>>(
+      `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/fields?api-version=6.0`
+    );
+    if (response.status == 200) return response.data.value;
   }
 
   async getProcesses(): Promise<Array<Process>> {

@@ -164,6 +164,95 @@ export interface AreaPath {
   url: string;
 }
 
+// Field
+export interface Field {
+  name: string;
+  referenceName: string;
+  description?: string;
+  type: FieldType;
+  usage: FieldUsage;
+  readOnly: boolean;
+  canSortBy: boolean;
+  isQueryable: boolean;
+  supportedOperations: Array<FieldSupportedOperation>;
+  isIdentity: boolean;
+  isPicklist: boolean;
+  isPicklistSuggested: boolean;
+  url: string;
+}
+
+export interface FieldSupportedOperation {
+  referenceName?: ReferenceName;
+  name: Name;
+}
+
+export enum Name {
+  Contains = "Contains",
+  ContainsWords = "Contains Words",
+  DoesNotContain = "Does Not Contain",
+  DoesNotContainWords = "Does Not Contain Words",
+  Empty = "=",
+  Field = "= [Field]",
+  Fluffy = "<",
+  FluffyField = "< [Field]",
+  In = "In",
+  InGroup = "In Group",
+  Name = "<>",
+  NameField = "<> [Field]",
+  NotIn = "Not In",
+  NotInGroup = "Not In Group",
+  NotUnder = "Not Under",
+  Purple = ">",
+  PurpleField = "> [Field]",
+  Sticky = "<=",
+  StickyField = "<= [Field]",
+  Tentacled = ">=",
+  TentacledField = ">= [Field]",
+  Under = "Under",
+  WasEver = "Was Ever",
+}
+
+export enum ReferenceName {
+  SupportedOperationsContains = "SupportedOperations.Contains",
+  SupportedOperationsContainsWords = "SupportedOperations.ContainsWords",
+  SupportedOperationsEquals = "SupportedOperations.Equals",
+  SupportedOperationsEqualsField = "SupportedOperations.EqualsField",
+  SupportedOperationsEver = "SupportedOperations.Ever",
+  SupportedOperationsGreaterThan = "SupportedOperations.GreaterThan",
+  SupportedOperationsGreaterThanEquals = "SupportedOperations.GreaterThanEquals",
+  SupportedOperationsGreaterThanEqualsField = "SupportedOperations.GreaterThanEqualsField",
+  SupportedOperationsGreaterThanField = "SupportedOperations.GreaterThanField",
+  SupportedOperationsIn = "SupportedOperations.In",
+  SupportedOperationsInGroup = "SupportedOperations.InGroup",
+  SupportedOperationsLessThan = "SupportedOperations.LessThan",
+  SupportedOperationsLessThanEquals = "SupportedOperations.LessThanEquals",
+  SupportedOperationsLessThanEqualsField = "SupportedOperations.LessThanEqualsField",
+  SupportedOperationsLessThanField = "SupportedOperations.LessThanField",
+  SupportedOperationsNotContains = "SupportedOperations.NotContains",
+  SupportedOperationsNotContainsWords = "SupportedOperations.NotContainsWords",
+  SupportedOperationsNotEquals = "SupportedOperations.NotEquals",
+  SupportedOperationsNotEqualsField = "SupportedOperations.NotEqualsField",
+  SupportedOperationsNotInGroup = "SupportedOperations.NotInGroup",
+  SupportedOperationsNotUnder = "SupportedOperations.NotUnder",
+  SupportedOperationsUnder = "SupportedOperations.Under",
+}
+
+export enum FieldType {
+  Boolean = "boolean",
+  DateTime = "dateTime",
+  Double = "double",
+  HTML = "html",
+  History = "history",
+  Integer = "integer",
+  PlainText = "plainText",
+  String = "string",
+  TreePath = "treePath",
+}
+
+export enum FieldUsage {
+  WorkItem = "workItem",
+}
+
 // Iteration
 export interface Iteration {
   id: string;
@@ -292,16 +381,6 @@ export interface WorkItemFields {
   "WEF_A32D92E82F644A1991D91FEFDC607DC1_Kanban.Column": string;
   "WEF_A32D92E82F644A1991D91FEFDC607DC1_Kanban.Column.Done": boolean;
   "System.Description": string;
-  "Custom.Components"?: string;
-  "Custom.ExportList"?: string;
-  "Custom.Fields"?: string;
-  "Custom.Files"?: string;
-  "Custom.Functions"?: string;
-  "Custom.Misc"?: string;
-  "Custom.ReleaseDetails"?: string;
-  "Custom.Scripts"?: string;
-  "Custom.Source"?: string;
-  "Custom.Tables"?: string;
   "System.Tags": string;
   "System.AssignedTo"?: User;
   "Microsoft.VSTS.Common.ResolvedDate"?: Date;
@@ -310,6 +389,7 @@ export interface WorkItemFields {
   "Microsoft.VSTS.Common.ClosedBy"?: User;
   "Microsoft.VSTS.Common.Severity"?: string;
   "Microsoft.VSTS.TCM.ReproSteps"?: string;
+  [custom: string]: unknown;
 }
 
 export interface User {

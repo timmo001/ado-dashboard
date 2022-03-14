@@ -18,6 +18,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { GridRowId, GridSelectionModel } from "@mui/x-data-grid";
+import { camelCase } from "lodash";
 // eslint-disable-next-line import/no-named-as-default
 import Icon from "@mdi/react";
 import moment from "moment";
@@ -25,6 +26,7 @@ import moment from "moment";
 import { AzureDevOps } from "lib/azureDevOps";
 import { groupByKey } from "lib/util";
 import {
+  Field,
   Iteration,
   ProcessWorkItemTypeExtended,
   State,
@@ -35,12 +37,17 @@ import { XLSXExport } from "lib/xlsxExport";
 import Layout from "components/Layout";
 import MoveIteration from "components/MoveIteration";
 import useStyles from "assets/jss/components/layout";
-import WorkItems, { stateIconMap, WorkItemsView } from "components/WorkItems";
+import WorkItems, {
+  CustomFieldMap,
+  stateIconMap,
+  WorkItemsView,
+} from "components/WorkItems";
 
 let azureDevOps: AzureDevOps;
 function Iteration(): ReactElement {
   const [alert, setAlert] = useState<string>();
   const [currentIteration, setCurrentIteration] = useState<Iteration>();
+  const [fields, setFields] = useState<Array<Field>>();
   const [iterations, setIterations] = useState<Array<Iteration>>();
   const [moveIteration, setMoveIteration] = useState<boolean>(false);
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
@@ -71,6 +78,7 @@ function Iteration(): ReactElement {
     const it = iteration && iteration !== "" ? iteration : "current";
     console.log("Iteration:", it);
     azureDevOps = new AzureDevOps(personalAccessToken, organization, project);
+    azureDevOps.getFields().then((result: Array<Field>) => setFields(result));
     azureDevOps.getIterations().then((result: Array<Iteration>) => {
       setIterations(result);
       const foundIteration = result.find((i: Iteration) =>
@@ -128,44 +136,54 @@ function Iteration(): ReactElement {
     return iterationsPicker.find((ip: Picker) => ip.id === currentIteration.id);
   }, [currentIteration, iterationsPicker]);
 
+  const customFieldMap = useMemo<CustomFieldMap>(() => {
+    if (!fields) return undefined;
+    const fieldMap = {};
+    for (const field of fields)
+      if (
+        field.referenceName.startsWith("Custom.") &&
+        !Object.keys(fieldMap).includes(field.referenceName)
+      )
+        fieldMap[field.referenceName] = {
+          key: camelCase(field.referenceName.replace("Custom.", "")),
+          title: field.name,
+        };
+    return fieldMap;
+  }, [fields]);
+
   const currentWorkItems = useMemo<Array<WorkItemExpanded>>(() => {
     if (!currentIteration || !workItems) return undefined;
-    return workItems
-      .filter((wi: WorkItemExpanded) => wi.iteration === currentIteration.name)
-      .map((wi: WorkItemExpanded) => ({
-        ...wi,
-        "Custom.ReleaseDetails": wi["Custom.ReleaseDetails"]?.replace(
-          /<[^>]*>?/gm,
-          ""
-        ),
-      }));
+    return workItems.filter(
+      (wi: WorkItemExpanded) => wi.iteration === currentIteration.name
+    );
   }, [currentIteration, workItems]);
 
   const currentWorkItemsView = useMemo<Array<WorkItemsView>>(() => {
-    if (!currentWorkItems) return undefined;
-    return currentWorkItems.map((wi: WorkItemExpanded) => ({
-      id: wi.id,
-      order: wi.order,
-      title: wi["System.Title"],
-      url: `https://dev.azure.com/${organization}/${project}/_workitems/edit/${wi.id}`,
-      type: wi["System.WorkItemType"],
-      iteration: wi.iteration,
-      state: wi["System.State"],
-      assignedTo: wi["System.AssignedTo"]?.displayName,
-      storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
-      tags: wi["System.Tags"],
-      areaPath: wi["System.AreaPath"],
-      components: wi["Custom.Components"],
-      functions: wi["Custom.Functions"],
-      exportList: wi["Custom.ExportList"],
-      tables: wi["Custom.Tables"],
-      fields: wi["Custom.Fields"],
-      scripts: wi["Custom.Scripts"],
-      files: wi["Custom.Fields"],
-      misc: wi["Custom.Misc"],
-      releaseDetails: wi["Custom.ReleaseDetails"],
-    }));
-  }, [currentWorkItems]);
+    if (!currentWorkItems || !customFieldMap) return undefined;
+    return currentWorkItems.map((wi: WorkItemExpanded) => {
+      const item = {
+        id: wi.id,
+        order: wi.order,
+        title: wi["System.Title"],
+        url: `https://dev.azure.com/${organization}/${project}/_workitems/edit/${wi.id}`,
+        type: wi["System.WorkItemType"],
+        iteration: wi.iteration,
+        state: wi["System.State"],
+        assignedTo: wi["System.AssignedTo"]?.displayName,
+        storyPoints: wi["Microsoft.VSTS.Scheduling.StoryPoints"],
+        tags: wi["System.Tags"],
+        areaPath: wi["System.AreaPath"],
+        blocked: wi["Microsoft.VSTS.CMMI.Blocked"],
+      };
+      for (const key of Object.keys(wi))
+        if (Object.keys(customFieldMap).includes(key))
+          item[customFieldMap[key].key] =
+            typeof wi[key] === "string"
+              ? String(wi[key]).replace(/<[^>]*>?/gm, "")
+              : wi[key];
+      return item;
+    });
+  }, [currentWorkItems, customFieldMap]);
 
   const itemsByState = useMemo<{
     [state: string]: Array<WorkItemExpanded>;
@@ -203,7 +221,7 @@ function Iteration(): ReactElement {
   }
 
   function handleGenerateChecklist(): void {
-    new XLSXExport().generateReleaseChecklist(currentWorkItems);
+    new XLSXExport().generateReleaseChecklist(currentWorkItems, customFieldMap);
   }
 
   const classes = useStyles();
@@ -214,16 +232,14 @@ function Iteration(): ReactElement {
       <Layout
         classes={classes}
         title={currentIteration?.name || "Iteration"}
-        description="Azure DevOps Dashboard"
-      >
+        description="Azure DevOps Dashboard">
         <Grid
           className={classes.main}
           component="article"
           container
           direction="row"
           alignContent="space-around"
-          justifyContent="space-around"
-        >
+          justifyContent="space-around">
           {alert ? (
             <Grid item xs={11}>
               <Alert severity="error">{alert}</Alert>
@@ -236,16 +252,14 @@ function Iteration(): ReactElement {
               container
               direction="row"
               alignContent="space-between"
-              justifyContent="space-between"
-            >
+              justifyContent="space-between">
               <Grid item xs={8}>
                 <Typography
                   component="h3"
                   variant="h4"
                   sx={{
                     padding: theme.spacing(1.8, 0, 1, 0),
-                  }}
-                >
+                  }}>
                   {currentIteration?.name || "Iteration"}
                 </Typography>
               </Grid>
@@ -256,8 +270,7 @@ function Iteration(): ReactElement {
                     xs={4}
                     sx={{
                       padding: theme.spacing(1, 0),
-                    }}
-                  >
+                    }}>
                     <Autocomplete
                       disablePortal
                       disableClearable
@@ -293,8 +306,7 @@ function Iteration(): ReactElement {
                     padding: theme.spacing(1, 0),
                   }}
                   alignContent="space-around"
-                  justifyContent="flex-end"
-                >
+                  justifyContent="flex-end">
                   <Grid
                     item
                     xs
@@ -302,8 +314,7 @@ function Iteration(): ReactElement {
                     direction="row"
                     alignContent="space-around"
                     justifyContent="space-around"
-                    sx={{ padding: theme.spacing(0, 1) }}
-                  >
+                    sx={{ padding: theme.spacing(0, 1) }}>
                     {states.map((state: State) => (
                       <Grid
                         key={state.id}
@@ -311,8 +322,7 @@ function Iteration(): ReactElement {
                         sx={{
                           padding: theme.spacing(1),
                           color: `#${state.color}`,
-                        }}
-                      >
+                        }}>
                         {stateIconMap[state.name] ? (
                           <Icon
                             color={`#${state.color}`}
@@ -332,8 +342,7 @@ function Iteration(): ReactElement {
                   <Grid item sx={{ paddingLeft: theme.spacing(1) }}>
                     <Button
                       variant="outlined"
-                      onClick={handleGenerateChecklist}
-                    >
+                      onClick={handleGenerateChecklist}>
                       Generate Release Checklist..
                     </Button>
                   </Grid>
@@ -341,8 +350,7 @@ function Iteration(): ReactElement {
                     <Button
                       disabled={selectionModel.length > 0 ? false : true}
                       variant="outlined"
-                      onClick={handleMoveIteration}
-                    >
+                      onClick={handleMoveIteration}>
                       Move to Sprint..
                     </Button>
                   </Grid>
@@ -352,9 +360,9 @@ function Iteration(): ReactElement {
                   xs={12}
                   sx={{
                     padding: theme.spacing(1, 0),
-                  }}
-                >
+                  }}>
                   <WorkItems
+                    customFieldMap={customFieldMap}
                     selectionModel={selectionModel}
                     states={states}
                     workItemsView={currentWorkItemsView}
@@ -366,8 +374,7 @@ function Iteration(): ReactElement {
               <Grid
                 container
                 alignContent="space-around"
-                justifyContent="space-around"
-              >
+                justifyContent="space-around">
                 <CircularProgress color="primary" />
               </Grid>
             )}
