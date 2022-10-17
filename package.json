@@ -34,7 +34,7 @@
     "recharts": "2.1.10"
   },
   "devDependencies": {
-    "@types/node": "18.0.0",
+    "@types/node": "18.11.0",
     "@types/react": "18.0.14",
     "@types/react-html-parser": "2.0.2",
     "@typescript-eslint/eslint-plugin": "5.29.0",
